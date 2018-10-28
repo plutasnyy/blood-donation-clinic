@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from backend.BloodDonationClinic.api.serializers import WorkerSerialier
-from backend.BloodDonationClinic.core.models import Worker
+from api.serializers import WorkerSerialier
+from core.models import Worker
 
 
 class WorkerViewSet(viewsets.ModelViewSet):

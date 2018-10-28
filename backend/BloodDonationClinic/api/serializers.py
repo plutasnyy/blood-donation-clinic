@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.BloodDonationClinic.core.models import Worker
+from core.models import Worker
 
 
 class WorkerSerialier(serializers.ModelSerializer):
