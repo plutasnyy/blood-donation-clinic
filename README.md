@@ -1,5 +1,5 @@
 # Blood Donation Clinic
-App focused on the database in  the Django + PostgreSQL
+App focused on the database in the Django with DRF + PostgreSQL
 
 ## Setup procss
 
