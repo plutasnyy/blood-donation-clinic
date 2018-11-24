@@ -18,10 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import WorkerViewSet
+from api.views import *
 
 router = routers.DefaultRouter()
 router.register(r'workers', WorkerViewSet)
+router.register(r'patients', PatientViewSet)
+router.register(r'departures', DepartureViewSet)
+router.register(r'presences', PresenceViewSet)
+router.register(r'donates', DonateBloodViewSet)
+router.register(r'samples', SampleViewSet)
+router.register(r'transfusions', TransfusionViewSet)
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
