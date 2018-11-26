@@ -3,7 +3,7 @@ App focused on the database in the Django with DRF + PostgreSQL
 
 ## Setup procss
 
-### How to install and configure PostgreSQL:
+### POSTGRESQL:
 ```bash
 sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib
 sudo su - postgres
@@ -18,7 +18,7 @@ GRANT ALL PRIVILEGES ON DATABASE blooddonationclinic TO admin;
 exit
 ```
 
-### How to run backend:
+### BACKEND:
 ```bash
 python3 -m venv env
 source env/bin/activate
@@ -30,4 +30,10 @@ python3 manage.py runserver 0.0.0.0:8000
 #### Remember after install packages:
 ```bash
 pip freeze > requirements.txt
+```
+
+### FRONTEND
+```bash
+npm i
+npm start
 ```
