@@ -1,9 +1,9 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
-import counterReducer from './counter'
+import workersReducer from './workers'
 
 const rootReducer = (history) => combineReducers({
-  count: counterReducer,
+  workersAPI: workersReducer,
   router: connectRouter(history)
 })
 
