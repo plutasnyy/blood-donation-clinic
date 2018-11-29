@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom'
 import App from './App'
 import rootReducer from './reducers'
 import thunk from 'redux-thunk';
+import 'semantic-ui-css/semantic.min.css';
 
 const history = createBrowserHistory()
 
