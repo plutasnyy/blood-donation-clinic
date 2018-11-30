@@ -5,9 +5,11 @@ import Hello from '../components/Hello'
 import Workers from '../components/Workers'
 import NoMatch from '../components/NoMatch'
 import NavBar from '../components/NavBar'
+import {Segment} from "semantic-ui-react";
 
 const routes = (
   <div>
+      <Segment>
     <NavBar />
     <Switch>
       <Route exact path="/" component={Home} />
@@ -15,6 +17,7 @@ const routes = (
       <Route path="/workers" component={Workers} />
       <Route component={NoMatch} />
     </Switch>
+      </Segment>
   </div>
 )
 

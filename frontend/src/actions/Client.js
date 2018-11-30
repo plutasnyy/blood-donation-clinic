@@ -3,5 +3,5 @@ import axios from 'axios';
 export const client = axios.create({
     baseURL: 'http://localhost:8000/api/',
     timeout: 1000,
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    headers: { 'content-type': 'application/json' },
 });

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
-import workersReducer from './workers'
+import workersReducer from './Workers'
 
 const rootReducer = (history) => combineReducers({
   workersAPI: workersReducer,
