@@ -28,6 +28,7 @@ router.register(r'presences', PresenceViewSet)
 router.register(r'donates', DonateBloodViewSet)
 router.register(r'samples', SampleViewSet)
 router.register(r'transfusions', TransfusionViewSet)
+router.register(r'blood', BloodTypeViewSet)
 
 urlpatterns = [
     url(r'api/', include(router.urls)),

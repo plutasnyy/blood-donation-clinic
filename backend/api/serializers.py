@@ -3,7 +3,7 @@ from rest_framework import serializers
 from core.models import *
 
 
-class WorkerSerialier(serializers.ModelSerializer):
+class WorkerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Worker
         fields = '__all__'
@@ -42,4 +42,10 @@ class SampleSerializer(serializers.ModelSerializer):
 class TransfusionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transfusion
+        fields = '__all__'
+
+
+class BloodTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BloodType
         fields = '__all__'

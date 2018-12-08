@@ -6,7 +6,7 @@ from core.models import *
 
 class WorkerViewSet(viewsets.ModelViewSet):
     queryset = Worker.objects.all()
-    serializer_class = WorkerSerialier
+    serializer_class = WorkerSerializer
 
 
 class PatientViewSet(viewsets.ModelViewSet):
@@ -31,7 +31,7 @@ class DonateBloodViewSet(viewsets.ModelViewSet):
 
 class WorkerViewSet(viewsets.ModelViewSet):
     queryset = Worker.objects.all()
-    serializer_class = WorkerSerialier
+    serializer_class = WorkerSerializer
 
 
 class SampleViewSet(viewsets.ModelViewSet):
@@ -42,3 +42,8 @@ class SampleViewSet(viewsets.ModelViewSet):
 class TransfusionViewSet(viewsets.ModelViewSet):
     queryset = Transfusion.objects.all()
     serializer_class = TransfusionSerializer
+
+
+class BloodTypeViewSet(viewsets.ModelViewSet):
+    queryset = BloodType.objects.all()
+    serializer_class = BloodTypeSerializer
