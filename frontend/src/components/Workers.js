@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import * as actions from '../actions/Workers';
-import {Button, Icon, Grid, Form, Segment, Input, Menu, Table, Message} from 'semantic-ui-react'
+import {Button, Grid, Form, Segment, Input, Table, Message} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
@@ -9,30 +9,29 @@ var initialState = {
     pesel: "",
     firstName: "",
     lastName: "",
+    salary: "",
     position: "",
     peselError: false,
     firstNameError: false,
     lastNameError: false,
     positionError: false,
-    isSelected: false
-}
+    salaryError: false,
+    isSelected: false,
+};
 
 class Workers extends React.Component {
 
     constructor(props) {
-        super(props)
-        this.state = {...initialState, search: ""}
+        super(props);
+        this.state = {...initialState, search: ""};
         this.props.fetchAllWorkers();
-        this.isPeselExist = this.isPeselExist.bind(this);
-        this.editWorker = this.editWorker.bind(this);
-        this.getPayload = this.getPayload.bind(this);
-        this.filterSearchWork = this.filterSearchWork.bind(this);
     }
 
     editWorker(worker) {
         this.setState({
             isSelected: true,
             pesel: worker.pesel,
+            salary: worker.salary,
             firstName: worker.first_name,
             lastName: worker.last_name,
             position: worker.position,
@@ -49,14 +48,34 @@ class Workers extends React.Component {
             "first_name": this.state.firstName,
             "last_name": this.state.lastName,
             "position": this.state.position,
+            "salary": this.state.salary,
+        }
+    }
+
+    static isNumber(n) {
+        return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
+    }
+
+    validatePesel(pesel) {
+        if (!Workers.isNumber(pesel) || this.isPeselExist(pesel) || pesel.length !== 11) {
+            this.setState({peselError: true});
+            return false;
+        } else {
+            this.setState({peselError: false});
+            return true;
+        }
+    }
+
+    validateSalary(salary) {
+        if (Workers.isNumber(salary) && salary >= 0) {
+            this.setState({salaryError: false});
+        } else {
+            this.setState({salaryError: true});
         }
     }
 
     handleAdd() {
-        if (!/^\d+$/.test(this.state.pesel) || this.isPeselExist(this.state.pesel)) {
-            this.setState({peselError: true})
-        } else {
-            this.setState({peselError:false})
+        if (this.validatePesel(this.state.pesel)) {
             this.props.addWorker(this.getPayload());
         }
     }
@@ -67,6 +86,12 @@ class Workers extends React.Component {
 
     onChangePesel(e) {
         this.setState({pesel: e.target.value});
+        this.validatePesel(e.target.value);
+    }
+
+    onChangeSalary(e) {
+        this.setState({salary: e.target.value});
+        this.validateSalary(e.target.value);
     }
 
     onChangeFirstName(e) {
@@ -126,15 +151,18 @@ class Workers extends React.Component {
                                             placeholder='Position'
                                             value={this.state.position} onChange={this.onChangePosition.bind(this)}
                                             error={this.state.positionError}/>
+                                <Form.Input id='form-input-control-salary' control={Input} label='Salary'
+                                            placeholder='Salary'
+                                            value={this.state.salary} onChange={this.onChangeSalary.bind(this)}
+                                            error={this.state.salaryError}/>
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={!(this.state.pesel.length === 11) || !this.state.firstName || !this.state.lastName || !this.state.position}>
+                                        disabled={this.state.peselError || !this.state.firstName || !this.state.lastName || !this.state.position || this.state.salaryError}>
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
                                     Update
                                 </Button>
-                                <Button onClick={this.resetState.bind(this)}
-                                        disabled={!(this.state.pesel.length === 11) || !this.state.firstName || !this.state.lastName || !this.state.position}>
+                                <Button onClick={this.resetState.bind(this)}>
                                     <FontAwesomeIcon icon="redo"/>
                                 </Button>
                             </Form>
@@ -143,7 +171,7 @@ class Workers extends React.Component {
 
 
                     <Grid.Column width={10}>
-                        {this.props.isError == true ?
+                        {this.props.isError === true ?
                             <Message
                                 error
                                 header='You are trying to do something forbidden.'
@@ -160,6 +188,7 @@ class Workers extends React.Component {
                                     <Table.HeaderCell>First Name</Table.HeaderCell>
                                     <Table.HeaderCell>Last Name</Table.HeaderCell>
                                     <Table.HeaderCell>Position</Table.HeaderCell>
+                                    <Table.HeaderCell>Salary</Table.HeaderCell>
                                     <Table.HeaderCell>Action</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
@@ -172,6 +201,7 @@ class Workers extends React.Component {
                                             <Table.Cell>{item.first_name}</Table.Cell>
                                             <Table.Cell>{item.last_name}</Table.Cell>
                                             <Table.Cell>{item.position}</Table.Cell>
+                                            <Table.Cell>{item.salary}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editWorker(item)}>
                                                     Edit

@@ -11,6 +11,7 @@ class Worker(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     position = models.CharField(max_length=30)
+    salary = models.PositiveIntegerField(default=1000)
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
