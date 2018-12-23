@@ -4,6 +4,7 @@ import * as actions from '../actions/Workers';
 import {Button, Grid, Form, Segment, Input, Table, Message} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {ErrorMessage} from "./ErrorMessage";
 
 var initialState = {
     pesel: "",
@@ -171,14 +172,7 @@ class Workers extends React.Component {
 
 
                     <Grid.Column width={10}>
-                        {this.props.isError === true ?
-                            <Message
-                                error
-                                header='You are trying to do something forbidden.'
-                                list={['Find if it is not a foreign key for other object']}
-                            />
-                            : null}
-
+                        <ErrorMessage error={this.props.isError}/>
                         <Segment> <Input onChange={this.searchOnChange.bind(this)} placeholder='Search...'/></Segment>
 
                         <Table celled>
