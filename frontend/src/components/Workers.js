@@ -57,6 +57,30 @@ class Workers extends React.Component {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
     }
 
+    validateFirstName(name) {
+        if (name.length > 30) {
+            this.setState({firstNameError: true})
+        } else {
+            this.setState({firstNameError: false})
+        }
+    }
+
+    validateLastName(name) {
+        if (name.length > 30) {
+            this.setState({lastNameError: true})
+        } else {
+            this.setState({lastNameError: false})
+        }
+    }
+
+    validatePosition(position) {
+        if (position.length > 30) {
+            this.setState({positionError: true})
+        } else {
+            this.setState({positionError: false})
+        }
+    }
+
     validatePesel(pesel) {
         if (!Workers.isNumber(pesel) || this.isPeselExist(pesel) || pesel.length !== 11) {
             this.setState({peselError: true});
@@ -97,14 +121,17 @@ class Workers extends React.Component {
 
     onChangeFirstName(e) {
         this.setState({firstName: e.target.value});
+        this.validateFirstName(e.target.value)
     }
 
     onChangeLastName(e) {
         this.setState({lastName: e.target.value});
+        this.validateLastName(e.target.value)
     }
 
     onChangePosition(e) {
         this.setState({position: e.target.value});
+        this.validatePosition(e.target.value)
     }
 
     resetState() {

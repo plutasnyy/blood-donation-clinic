@@ -35,17 +35,43 @@ class BloodTypes extends React.Component {
 
     getPayload() {
         let dict = {
-            "blod": this.state.blood,
+            "blood": this.state.blood,
             "rh": this.state.rh,
         };
         if (this.state.isSelected) {
-            dict += {"id": this.state.id}
+            dict = {...dict, "id": this.state.id}
         }
         return dict;
     }
 
+    isIdExist(id) {
+        return this.props.bloodTypes.filter(blood => blood.id === id).length > 0;
+    }
+
+    validateId() {
+        if (this.isIdExist(this.state.id)) {
+            this.setState({idError: true})
+        }
+    }
+
+    validateBlood(blood) {
+        if (blood.length > 2) {
+            this.setState({bloodError: true});
+        } else {
+            this.setState({bloodError: false});
+        }
+    }
+
+    validateRh(rh) {
+        if (rh.length > 1) {
+            this.setState({rhError: true});
+        } else {
+            this.setState({rhError: false});
+        }
+    }
 
     handleAdd() {
+        this.validateId();
         this.props.addBloodType(this.getPayload());
     }
 
@@ -55,10 +81,12 @@ class BloodTypes extends React.Component {
 
     onChangeBlood(e) {
         this.setState({blood: e.target.value});
+        this.validateBlood(e.target.value)
     }
 
     onChangeRh(e) {
         this.setState({rh: e.target.value});
+        this.validateRh(e.target.value)
     }
 
     resetState() {
@@ -70,8 +98,8 @@ class BloodTypes extends React.Component {
     }
 
     filterSearch(item) {
-        let name = `{item.blood} Rh{item.rh}`;
-        if (item.blood.includes(this.state.search) || input.rh.includes(this.state.search) || name.includes(this.state.search)) {
+        let name = `${item.blood} Rh${item.rh}`;
+        if (item.blood.includes(this.state.search) || item.rh.includes(this.state.search) || name.includes(this.state.search)) {
             return item;
         }
     }
@@ -90,11 +118,14 @@ class BloodTypes extends React.Component {
                         <Segment>
                             <Form>
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
-                                            placeholder='Id' value={this.state.id} disabled/>
-                                <Form.Input id='form-input-control-blood' control={Input} label='Blood' placeholder='Blood'
-                                            value={this.state.blood} onChange={this.onChangeBlood.bind(this)}/>
+                                            placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
+                                <Form.Input id='form-input-control-blood' control={Input} label='Blood'
+                                            placeholder='Blood'
+                                            value={this.state.blood} onChange={this.onChangeBlood.bind(this)}
+                                            error={this.state.bloodError}/>
                                 <Form.Input id='form-input-control-rh' control={Input} label='Rh' placeholder='Rh'
-                                            value={this.state.rh} onChange={this.onChangeRh.bind(this)}/>
+                                            value={this.state.rh} onChange={this.onChangeRh.bind(this)}
+                                            error={this.state.rhError}/>
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
                                         disabled={!this.state.blood || !this.state.rh}>
                                     Add
@@ -136,7 +167,7 @@ class BloodTypes extends React.Component {
                                                 <Button color='blue' onClick={() => this.editBlood(item)}>
                                                     Edit
                                                 </Button>
-                                                <Button color='red' onClick={() => this.props.deleteBlood(item.id)}>
+                                                <Button color='red' onClick={() => this.props.deleteBloodType(item.id)}>
                                                     Delete
                                                 </Button>
                                             </Table.Cell>
