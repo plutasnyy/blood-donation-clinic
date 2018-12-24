@@ -18,12 +18,9 @@ class Worker(models.Model):
 
 
 class BloodType(models.Model):
-    BLOOD_TYPE_CHOICES = ((x, x) for x in ["0", "A", "B", "AB"])
-    RH_TYPE_CHOICES = ((x, x) for x in ["+", "-"])
-
     id = models.AutoField(primary_key=True)
-    blood = models.CharField(choices=BLOOD_TYPE_CHOICES, max_length=2)
-    rh = models.CharField(choices=RH_TYPE_CHOICES, max_length=1)
+    blood = models.CharField(max_length=2)
+    rh = models.CharField(max_length=1)
 
     def __str__(self):
         return "{} Rh{}".format(self.blood, self.rh)
