@@ -1,12 +1,19 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import * as actions from '../actions/Workers';
+import * as actions from '../actions/Request';
 import {Button, Grid, Form, Segment, Input, Table, Message} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ErrorMessage} from "./ErrorMessage";
+import {
+    ADD_WORKER_SUCCESS,
+    DELETE_WORKER_SUCCESS,
+    FETCH_WORKERS, GET_DATA_FAILED_WORKER,
+    GET_DATA_REQUESTED_WORKER,
+    UPDATE_WORKER_SUCCESS
+} from "../ActionsTypes";
 
-var initialState = {
+let initialState = {
     pesel: "",
     firstName: "",
     lastName: "",
@@ -19,6 +26,8 @@ var initialState = {
     salaryError: false,
     isSelected: false,
 };
+
+let apiUrl = 'workers/';
 
 class Workers extends React.Component {
 
@@ -45,6 +54,7 @@ class Workers extends React.Component {
 
     getPayload() {
         return {
+            "id": this.state.pesel,
             "pesel": this.state.pesel,
             "first_name": this.state.firstName,
             "last_name": this.state.lastName,
@@ -184,7 +194,8 @@ class Workers extends React.Component {
                                             value={this.state.salary} onChange={this.onChangeSalary.bind(this)}
                                             error={this.state.salaryError}/>
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={this.state.peselError || !this.state.firstName || !this.state.lastName || !this.state.position || this.state.salaryError}>
+                                        disabled={this.state.peselError || !this.state.firstName || !this.state.lastName
+                                        || !this.state.position || !this.state.salary || this.state.salaryError || this.state.isSelected}>
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
@@ -254,10 +265,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        fetchAllWorkers: () => dispatch(actions.fetchAllWorkers()),
-        addWorker: payload => dispatch(actions.addWorker(payload)),
-        deleteWorker: id => dispatch(actions.deleteWorker(id)),
-        updateWorker: payload => dispatch(actions.updateWorker(payload))
+        fetchAllWorkers: () => dispatch(actions.fetchAllItems(apiUrl,FETCH_WORKERS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        addWorker: payload => dispatch(actions.addItem(payload,apiUrl, ADD_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        deleteWorker: id => dispatch(actions.deleteItem(id,apiUrl, DELETE_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        updateWorker: payload => dispatch(actions.updateItem(payload,apiUrl, UPDATE_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER))
     }
 };
 

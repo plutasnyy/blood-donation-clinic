@@ -1,12 +1,18 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import * as actions from '../actions/BloodTypes';
-import {Button, Grid, Form, Segment, Input, Table, Message} from 'semantic-ui-react'
+import * as actions from '../actions/Request';
+import {Button, Grid, Form, Segment, Input, Table} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ErrorMessage} from './ErrorMessage';
+import {
+    ADD_BLOOD_TYPE_SUCCESS,
+    DELETE_BLOOD_TYPE_SUCCESS,
+    FETCH_BLOOD_TYPES, GET_DATA_FAILED_BLOOD, GET_DATA_REQUESTED_BLOOD,
+    UPDATE_BLOOD_TYPE_SUCCESS
+} from "../ActionsTypes";
 
-var initialState = {
+let initialState = {
     id: "",
     blood: "",
     rh: "",
@@ -15,6 +21,8 @@ var initialState = {
     rhError: false,
     isSelected: false,
 };
+
+let apiUrl = 'blood/';
 
 class BloodTypes extends React.Component {
 
@@ -38,14 +46,14 @@ class BloodTypes extends React.Component {
             "blood": this.state.blood,
             "rh": this.state.rh,
         };
-        if (this.state.isSelected) {
+        if (this.state.id !== "") {
             dict = {...dict, "id": this.state.id}
         }
         return dict;
     }
 
     isIdExist(id) {
-        return this.props.bloodTypes.filter(blood => blood.id === id).length > 0;
+        return this.props.departures.filter(blood => blood.id === id).length > 0;
     }
 
     validateId() {
@@ -127,7 +135,7 @@ class BloodTypes extends React.Component {
                                             value={this.state.rh} onChange={this.onChangeRh.bind(this)}
                                             error={this.state.rhError}/>
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={!this.state.blood || !this.state.rh}>
+                                        disabled={!this.state.blood || !this.state.rh || this.state.isSelected}>
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
@@ -157,7 +165,7 @@ class BloodTypes extends React.Component {
                             </Table.Header>
 
                             <Table.Body>
-                                {this.props.bloodTypes.filter(blood => this.filterSearch(blood)).map((item, index) => {
+                                {this.props.departures.filter(blood => this.filterSearch(blood)).map((item, index) => {
                                     return (
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
@@ -185,7 +193,7 @@ class BloodTypes extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        bloodTypes: state.bloodTypesAPI.bloodTypes,
+        departures: state.bloodTypesAPI.departures,
         isLoading: state.bloodTypesAPI.isLoading,
         isError: state.bloodTypesAPI.isError
     };
@@ -193,10 +201,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        fetchAllBloodTypes: () => dispatch(actions.fetchAllBloodTypes()),
-        addBloodType: payload => dispatch(actions.addBloodType(payload)),
-        deleteBloodType: id => dispatch(actions.deleteBloodType(id)),
-        updateBloodType: payload => dispatch(actions.updateBloodType(payload))
+        fetchAllBloodTypes: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_BLOOD_TYPES, GET_DATA_REQUESTED_BLOOD, GET_DATA_FAILED_BLOOD)),
+        addBloodType: payload => dispatch(actions.addItem(payload, apiUrl, ADD_BLOOD_TYPE_SUCCESS, GET_DATA_REQUESTED_BLOOD, GET_DATA_FAILED_BLOOD)),
+        deleteBloodType: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_BLOOD_TYPE_SUCCESS, GET_DATA_REQUESTED_BLOOD, GET_DATA_FAILED_BLOOD)),
+        updateBloodType: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_BLOOD_TYPE_SUCCESS, GET_DATA_REQUESTED_BLOOD, GET_DATA_FAILED_BLOOD))
     };
-}
+};
 export default connect(mapStateToProps, mapDispatchToProps)(BloodTypes)
