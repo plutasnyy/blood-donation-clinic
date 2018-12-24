@@ -25,6 +25,9 @@ class NavBar extends React.Component {
                     <Menu.Item name='/workers' active={activeItem === '/workers'} onClick={this.handleItemClick}>
                         <Link to="/workers">Workers</Link>
                     </Menu.Item>
+                    <Menu.Item name='/departures' active={activeItem === '/departures'} onClick={this.handleItemClick}>
+                        <Link to="/departures">Departures</Link>
+                    </Menu.Item>
                     <Menu.Item name='/blood-types' active={activeItem === '/blood-types'} onClick={this.handleItemClick}>
                         <Link to="/blood-types">Blood Types</Link>
                     </Menu.Item>
