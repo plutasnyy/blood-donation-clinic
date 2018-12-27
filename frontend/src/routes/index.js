@@ -8,6 +8,7 @@ import {Segment} from "semantic-ui-react";
 import BloodType from "../components/BloodTypes";
 import Departures from "../components/Departures";
 import Patients from "../components/Patients";
+import Presences from "../components/Presences";
 
 const routes = (
     <div>
@@ -19,6 +20,7 @@ const routes = (
                 <Route path="/departures" component={Departures}/>
                 <Route path="/blood-types" component={BloodType}/>
                 <Route path="/patients" component={Patients}/>
+                <Route path="/presences" component={Presences}/>
                 <Route component={NoMatch}/>
             </Switch>
         </Segment>
