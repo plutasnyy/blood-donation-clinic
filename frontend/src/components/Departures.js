@@ -123,8 +123,8 @@ class Departures extends React.Component {
                             <Form>
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
-
-                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} />
+                                <strong>Date</strong>   <br/>
+                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} /><br/><br/>
                                 <Form.Input id='form-input-control-place' control={Input} label='Place' placeholder='Place'
                                             value={this.state.place} onChange={this.onChangePlace.bind(this)}
                                             error={this.state.placeError}/>

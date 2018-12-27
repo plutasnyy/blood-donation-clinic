@@ -59,7 +59,7 @@ class Presence(models.Model):
 
 class DonateBlood(models.Model):
     id = models.AutoField(primary_key=True)
-    date = models.DateTimeField(default=datetime.now)
+    date = models.DateField(_("Date"), default=datetime.today)
     patient = models.ForeignKey(Patient, on_delete=models.PROTECT)
     presence = models.ForeignKey(Presence, null=True, blank=True, on_delete=models.PROTECT)
     worker = models.ForeignKey(Worker, null=True, blank=True, on_delete=models.PROTECT)
@@ -86,7 +86,7 @@ class Transfusion(models.Model):
     sample = models.OneToOneField(Sample, on_delete=models.PROTECT)
     worker = models.ForeignKey(Worker, on_delete=models.PROTECT)
     patient = models.ForeignKey(Patient, on_delete=models.PROTECT)
-    date = models.DateTimeField(default=datetime.now)
+    date = models.DateField(_("Date"), default=datetime.today)
 
     def __str__(self):
         return "{} to {}".format(self.sample, self.patient)

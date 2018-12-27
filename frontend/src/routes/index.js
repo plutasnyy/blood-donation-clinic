@@ -9,6 +9,7 @@ import BloodType from "../components/BloodTypes";
 import Departures from "../components/Departures";
 import Patients from "../components/Patients";
 import Presences from "../components/Presences";
+import Donations from "../components/Donations";
 
 const routes = (
     <div>
@@ -21,6 +22,7 @@ const routes = (
                 <Route path="/blood-types" component={BloodType}/>
                 <Route path="/patients" component={Patients}/>
                 <Route path="/presences" component={Presences}/>
+                <Route path="/donations" component={Donations}/>
                 <Route component={NoMatch}/>
             </Switch>
         </Segment>
