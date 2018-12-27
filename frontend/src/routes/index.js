@@ -7,6 +7,7 @@ import NavBar from '../components/NavBar'
 import {Segment} from "semantic-ui-react";
 import BloodType from "../components/BloodTypes";
 import Departures from "../components/Departures";
+import Patients from "../components/Patients";
 
 const routes = (
     <div>
@@ -17,6 +18,7 @@ const routes = (
                 <Route path="/workers" component={Workers}/>
                 <Route path="/departures" component={Departures}/>
                 <Route path="/blood-types" component={BloodType}/>
+                <Route path="/patients" component={Patients}/>
                 <Route component={NoMatch}/>
             </Switch>
         </Segment>
