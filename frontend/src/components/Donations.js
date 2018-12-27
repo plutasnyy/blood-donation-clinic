@@ -30,7 +30,7 @@ let initialState = {
     patientPesel: "",
     workerPesel: "",
     presenceId: "",
-    idError: false,
+    inputType: "presence",
     isSelected: false,
 };
 
@@ -51,10 +51,15 @@ class Donations extends React.Component {
             isSelected: true,
             id: item.id,
             date: item.date,
-            patientPesel: item.patientPesel,
-            workerPesel: item.workerPesel,
-            presenceId: item.presenceId,
+            patientPesel: item.patient,
+            workerPesel: item.worker,
+            presenceId: item.presence,
         })
+        if(item.presence == null){
+            this.handleDateWorker(item);
+        } else {
+            this.handlePresence(item);
+        }
     }
 
     getPayload() {
@@ -97,13 +102,20 @@ class Donations extends React.Component {
         this.props.updateItem(this.getPayload());
     }
 
-    onChangePlace(e) {
-        this.setState({place: e.target.value});
-        this.validatePlace(e.target.value)
+    validateDate(date) {
+        if (this.state.presenceId != "") {
+            let p = this.props.presencesItems.filter(p => p.id == this.state.presenceId + '')[0]
+            let d = this.props.departuresItems.filter(d => d.id == p.departure + '')[0]
+            if (d.date != date) {
+                this.setState({dateError: true})
+            }
+        }
+        this.setState({dateError: false})
     }
 
     onChangeDate(d) {
-        let date =  `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
+        let date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+        this.validateDate(date);
         this.setState({date: date});
     }
 
@@ -132,7 +144,34 @@ class Donations extends React.Component {
         this.setState({[key]: value});
     }
 
+    handleDateWorker(e) {
+        this.setState({inputType: "dateWorker", presenceId: ""})
+    }
+
+    handlePresence(e) {
+        this.setState({inputType: "presence", date: "", workerPesel: ""})
+    }
+
     render() {
+        let formContent = "";
+        if (this.state.inputType === "dateWorker") {
+            formContent = <div>
+                <strong>Date</strong> <br/>
+                < DayPickerInput onDayChange={this.onChangeDate.bind(this)}
+                                 value={this.state.date}/><br/><br/>
+                <Form.Select fluid label='Worker' options={this.props.workersOptions}
+                             placeholder='Worker'
+                             onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
+                             value={this.state.workerPesel} disable={this.state.presenceId}/><br/>
+            </div>
+        } else {
+            formContent = <div>
+                <Form.Select fluid label='Presence' options={this.props.presencesOptions}
+                             placeholder='Presence'
+                             onChange={(e, {value}) => this.handleDropdownChange(value, 'presenceId')}
+                             value={this.state.presenceId}/><br/>
+            </div>
+        }
         return (
             <div>
                 <Grid>
@@ -141,22 +180,24 @@ class Donations extends React.Component {
                             <Form>
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
-                                <strong>Date</strong><br/>
-                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} /><br/><br/>
-                                <Form.Select fluid label='Worker' options={this.props.workersOptions} placeholder='Worker'
-                                             onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
-                                             value={this.state.workerId} disable={this.state.presenceId}/>
-                                <Form.Select fluid label='Presence' options={this.props.presencesOptions} placeholder='Presence'
-                                             onChange={(e, {value}) => this.handleDropdownChange(value, 'presenceId')}
-                                             value={this.state.presenceId}/>
-                                <Form.Select fluid label='Patient' options={this.props.patientOptions} placeholder='Presence'
+                                <Form.Select fluid label='Patient' options={this.props.patientOptions}
+                                             placeholder='Presence'
                                              onChange={(e, {value}) => this.handleDropdownChange(value, 'patientPesel')}
                                              value={this.state.patientPesel}/>
+                                <Button.Group>
+                                    <Button onClick={this.handleDateWorker.bind(this)} color={'teal'}>Date &
+                                        Worker</Button>
+                                    <Button.Or/>
+                                    <Button onClick={this.handlePresence.bind(this)} color={'olive'}>Presence</Button>
+                                </Button.Group><br/><br/>
+                                {formContent}
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={((!this.state.date || !this.state.workerPesel) && this.state.presenceId) || !this.state.patientPesel}>
+                                        disabled={!this.state.patientPesel || this.state.isSelected || !(this.state.date && this.state.workerPesel || this.state.presenceId)}>
                                     Add
                                 </Button>
-                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
+                                <Button type='submit' color='blue'
+                                        disabled={!this.state.patientPesel || !(this.state.date && this.state.workerPesel || this.state.presenceId) }
+                                        onClick={this.handleUpdate.bind(this)}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
@@ -190,9 +231,9 @@ class Donations extends React.Component {
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
                                             <Table.Cell>{item.date}</Table.Cell>
-                                            <Table.Cell>{item.patient}</Table.Cell>
-                                            <Table.Cell>{item.worker}</Table.Cell>
-                                            <Table.Cell>{item.presence}</Table.Cell>
+                                            <Table.Cell>{getWorkerFromId(item.patient, this.props.patientsItems)}</Table.Cell>
+                                            <Table.Cell>{getWorkerFromId(item.worker, this.props.workersItems)}</Table.Cell>
+                                            <Table.Cell>{getPresenceFromId(item.presence, this.props.workersItems, this.props.departuresItems, this.props.presencesItems)}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit
@@ -212,8 +253,9 @@ class Donations extends React.Component {
         )
     }
 }
-function getWorkerFromId(id,workers) {
-    let worker = workers.filter(worker => worker.pesel === id)[0];
+
+function getWorkerFromId(id, workers) {
+    let worker = workers.filter(worker => worker.pesel === (id + ''))[0];
     if (worker !== undefined) {
         return `${worker.first_name} ${worker.last_name}`
     } else {
@@ -221,31 +263,33 @@ function getWorkerFromId(id,workers) {
     }
 }
 
-function getDepartureFromId(id, departures){
-    let departure = departures.filter(departure=>departure.id===id)[0];
-    if(departure!==undefined){
+function getDepartureFromId(id, departures) {
+    let departure = departures.filter(departure => departure.id == id + '')[0];
+    if (departure !== undefined) {
         return `${departure.place} ${departure.date}`
     } else {
         return id;
     }
 }
 
-function getPresenceFromId(presence, workers, departures){
-    if(presence!==undefined){
-        return getWorkerFromId(presence.worker, workers) + " " + getDepartureFromId(presence.departure, departures)
+function getPresenceFromId(id, workers, departures, presences) {
+    let presence = presences.filter(p => p.id == id + '')[0];
+    if (presence !== undefined) {
+        return getWorkerFromId(presence.worker, workers) + " " + getDepartureFromId(presence.departure, departures);
     } else {
         return presence;
     }
 }
-// const createWorkersOptions = (workers) => {
-//     return workers.map(function (worker) {
-//         return {
-//             key: worker.pesel,
-//             value: worker.pesel,
-//             text: `${worker.first_name} ${worker.last_name}`,
-//         }
-//     });
-// };
+
+const createWorkersOptions = (workers) => {
+    return workers.map(function (worker) {
+        return {
+            key: worker.pesel,
+            value: worker.pesel,
+            text: `${worker.first_name} ${worker.last_name}`,
+        }
+    });
+};
 
 const createDeparturesOptions = (departures) => {
     return departures.map(function (departure) {
@@ -258,22 +302,20 @@ const createDeparturesOptions = (departures) => {
 };
 
 const createPresencesOptions = (presences, workers, departures) => {
-    console.log(getPresenceFromId(presences[0], workers, departures));
     return presences.map(function (presence) {
         return {
             key: presence.id,
             value: presence.id,
-            text: getPresenceFromId(presence, workers, departures),
+            text: getPresenceFromId(presence.id, workers, departures, presences),
         }
     })
 };
 
 const mapStateToProps = (state) => {
-    console.log(state);
     return {
-        // workersOptions: createWorkersOptions(state.workersAPI.workers),
-        // workersItems: state.workersAPI.workers,
-        // patientOptions: createWorkersOptions(state.patientsAPI),
+        workersOptions: createWorkersOptions(state.workersAPI.workers),
+        workersItems: state.workersAPI.workers,
+        patientOptions: createWorkersOptions(state.patientsAPI.patients),
         patientsItems: state.patientsAPI.patients,
         departuresOptions: createDeparturesOptions(state.departureAPI.departures),
         departuresItems: state.departureAPI.departures,
