@@ -13,6 +13,8 @@ import {connect} from "react-redux";
 import {Button, Grid, Form, Segment, Input, Table} from "semantic-ui-react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ErrorMessage} from "./ErrorMessage";
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
 
 let apiUrl = 'departures/';
 
@@ -64,14 +66,6 @@ class Departures extends React.Component {
         }
     }
 
-    validateDate(date) {
-        // if (blood.length > 2) {
-        //     this.setState({dateError: true});
-        // } else {
-        //     this.setState({dateError: false});
-        // }
-    }
-
     validatePlace(place) {
         if (place.length > 30) {
             this.setState({placeError: true});
@@ -94,9 +88,9 @@ class Departures extends React.Component {
         this.validatePlace(e.target.value)
     }
 
-    onChangeDate(e) {
-        this.setState({date: e.target.value});
-        this.validateDate(e.target.value)
+    onChangeDate(d) {
+        let date =  `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
+        this.setState({date: date});
     }
 
     resetState() {
@@ -129,6 +123,8 @@ class Departures extends React.Component {
                             <Form>
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
+
+                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} />
                                 <Form.Input id='form-input-control-place' control={Input} label='Place' placeholder='Place'
                                             value={this.state.place} onChange={this.onChangePlace.bind(this)}
                                             error={this.state.placeError}/>
@@ -202,7 +198,7 @@ const mapDispatchToProps = (dispatch) => {
         fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_DEPARTURES, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
         addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_DEPARTURE_SUCCESS, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
         deleteItem: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_DEPARTURE_SUCCESS, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
-        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_DEPARTURE_SUCCESS))
+        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_DEPARTURE_SUCCESS, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE))
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Departures)
