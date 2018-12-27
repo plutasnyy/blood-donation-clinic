@@ -19,15 +19,28 @@ class NavBar extends React.Component {
         return (
             <Segment inverted>
                 <Menu inverted secondary>
-                    <Menu.Item name='/' active={activeItem === '/'} onClick={this.handleItemClick}>
-                        <Link to="/">Home </Link>
-                    </Menu.Item>
-                    <Menu.Item name='/workers' active={activeItem === '/workers'} onClick={this.handleItemClick}>
-                        <Link to="/workers">Workers</Link>
-                    </Menu.Item>
-                    <Menu.Item name='/blood-types' active={activeItem === '/blood-types'} onClick={this.handleItemClick}>
-                        <Link to="/blood-types">Blood Types</Link>
-                    </Menu.Item>
+                    <Link to="/">
+                        <Menu.Item name='/' active={activeItem === '/'} onClick={this.handleItemClick}>
+                            Home
+                        </Menu.Item>
+                    </Link>
+                    <Link to="/workers">
+                        <Menu.Item name='/workers' active={activeItem === '/workers'} onClick={this.handleItemClick}>
+                            Workers
+                        </Menu.Item>
+                    </Link>
+                    <Link to="/departures">
+                        <Menu.Item name='/departures' active={activeItem === '/departures'}
+                                   onClick={this.handleItemClick}>
+                            Departures
+                        </Menu.Item>
+                    </Link>
+                    <Link to="/blood-types">
+                        <Menu.Item name='/blood-types' active={activeItem === '/blood-types'}
+                                   onClick={this.handleItemClick}>
+                            Blood Types
+                        </Menu.Item>
+                    </Link>
                 </Menu>
             </Segment>
         )

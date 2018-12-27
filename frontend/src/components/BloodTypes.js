@@ -8,7 +8,9 @@ import {ErrorMessage} from './ErrorMessage';
 import {
     ADD_BLOOD_TYPE_SUCCESS,
     DELETE_BLOOD_TYPE_SUCCESS,
-    FETCH_BLOOD_TYPES, GET_DATA_FAILED_BLOOD, GET_DATA_REQUESTED_BLOOD,
+    FETCH_BLOOD_TYPES,
+    GET_DATA_FAILED_BLOOD,
+    GET_DATA_REQUESTED_BLOOD,
     UPDATE_BLOOD_TYPE_SUCCESS
 } from "../ActionsTypes";
 
@@ -53,7 +55,7 @@ class BloodTypes extends React.Component {
     }
 
     isIdExist(id) {
-        return this.props.departures.filter(blood => blood.id === id).length > 0;
+        return this.props.bloodTypes.filter(blood => blood.id === id).length > 0;
     }
 
     validateId() {
@@ -165,7 +167,7 @@ class BloodTypes extends React.Component {
                             </Table.Header>
 
                             <Table.Body>
-                                {this.props.departures.filter(blood => this.filterSearch(blood)).map((item, index) => {
+                                {this.props.bloodTypes.filter(blood => this.filterSearch(blood)).map((item, index) => {
                                     return (
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
@@ -193,7 +195,7 @@ class BloodTypes extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        departures: state.bloodTypesAPI.departures,
+        bloodTypes: state.bloodTypesAPI.bloodTypes,
         isLoading: state.bloodTypesAPI.isLoading,
         isError: state.bloodTypesAPI.isError
     };
