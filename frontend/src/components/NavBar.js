@@ -41,6 +41,12 @@ class NavBar extends React.Component {
                             Blood Types
                         </Menu.Item>
                     </Link>
+                    <Link to="/patients">
+                        <Menu.Item name='/patients' active={activeItem === '/patients'}
+                                   onClick={this.handleItemClick}>
+                            Patients
+                        </Menu.Item>
+                    </Link>
                 </Menu>
             </Segment>
         )

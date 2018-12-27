@@ -11,7 +11,7 @@ class WorkerViewSet(viewsets.ModelViewSet):
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
-    serializer_class = Patient
+    serializer_class = PatientSerializer
 
 
 class DepartureViewSet(viewsets.ModelViewSet):
@@ -27,11 +27,6 @@ class PresenceViewSet(viewsets.ModelViewSet):
 class DonateBloodViewSet(viewsets.ModelViewSet):
     queryset = DonateBlood.objects.all()
     serializer_class = DonateBloodSerializer
-
-
-class WorkerViewSet(viewsets.ModelViewSet):
-    queryset = Worker.objects.all()
-    serializer_class = WorkerSerializer
 
 
 class SampleViewSet(viewsets.ModelViewSet):
