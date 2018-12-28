@@ -15,6 +15,7 @@ class Resources extends React.Component {
     }
 
     render() {
+        console.log(this.props.resources)
         return (
             <div>
                 <Grid>
@@ -29,15 +30,12 @@ class Resources extends React.Component {
                             </Table.Header>
 
                             <Table.Body>
-                                {this.props.workers.filter(worker => this.filterSearchWork(worker)).map((item, index) => {
-                                    console.log(item)
+                                {this.props.resources.map((item, index) => {
                                     return (
                                         <Table.Row key={index}>
-                                            {/*<Table.Cell>{item.pesel}</Table.Cell>*/}
-                                            {/*<Table.Cell>{item.first_name}</Table.Cell>*/}
-                                            {/*<Table.Cell>{item.last_name}</Table.Cell>*/}
-                                            {/*<Table.Cell>{item.position}</Table.Cell>*/}
-                                            {/*<Table.Cell>{item.salary}</Table.Cell>*/}
+                                            <Table.Cell>{item.id}</Table.Cell>
+                                            <Table.Cell>{item.blood_name}</Table.Cell>
+                                            <Table.Cell>{item.quantity}</Table.Cell>
                                         </Table.Row>
                                     );
                                 })}
@@ -52,6 +50,7 @@ class Resources extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+    console.log(state)
     return {
         resources: state.resourcesAPI.resources,
         isLoading: state.resourcesAPI.isLoading,
@@ -61,7 +60,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        fetchAll: () => dispatch(actions.fetchAllItems(apiUrl,FETCH_RESOURCES, GET_DATA_REQUESTED_RESOURCES, GET_DATA_FAILED_RESOURCES)),
+        fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_RESOURCES, GET_DATA_REQUESTED_RESOURCES, GET_DATA_FAILED_RESOURCES)),
     }
 };
 

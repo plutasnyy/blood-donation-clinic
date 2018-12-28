@@ -14,7 +14,7 @@ const rootReducer = (history) => combineReducers({
     departureAPI: departureReducer,
     patientsAPI: patientsReducer,
     presencesAPI: presencesReducer,
-    resourcesAPI: resourcesReducer(),
+    resourcesAPI: resourcesReducer,
     donationsAPI: donationReducer,
     router: connectRouter(history)
 });

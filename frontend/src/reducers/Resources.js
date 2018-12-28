@@ -7,7 +7,6 @@ import {
 let initialState = {isLoading: false, isError: false, resources: []};
 
 const resourcesReducer = (state = initialState, action) => {
-    console.log(action)
     switch (action.type) {
         case GET_DATA_REQUESTED_RESOURCES:
             return {...state, isLoading: true};
