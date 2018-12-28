@@ -23,6 +23,7 @@ export function getDataFailed(error, failedAction) {
 export function fetchAllItems(apiUrl, actionType, requestAction, failedAction) {
     return dispatch => {
         dispatch(getDataRequested(requestAction));
+        console.log(actionType);
         client.get(apiUrl)
             .then(response => {
                 dispatch(fetchSuccess(response.data, actionType));
