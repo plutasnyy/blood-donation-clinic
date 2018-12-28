@@ -5,6 +5,7 @@ import bloodTypesReducer from "./BloodTypes";
 import departureReducer from "./Departure";
 import patientsReducer from "./Patients";
 import presencesReducer from "./Presence";
+import resourcesReducer from "./Resources";
 
 const rootReducer = (history) => combineReducers({
   workersAPI: workersReducer,
@@ -12,6 +13,7 @@ const rootReducer = (history) => combineReducers({
   departureAPI: departureReducer,
   patientsAPI: patientsReducer,
   presencesAPI: presencesReducer,
+  resourcesAPI: resourcesReducer(),
   router: connectRouter(history)
 });
 
