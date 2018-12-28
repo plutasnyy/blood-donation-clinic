@@ -25,7 +25,7 @@ class Resources extends React.Component {
                                 <Table.Row>
                                     <Table.HeaderCell>Id</Table.HeaderCell>
                                     <Table.HeaderCell>Blood Type</Table.HeaderCell>
-                                    <Table.HeaderCell>Quantity</Table.HeaderCell>
+                                    <Table.HeaderCell>Quantity [l]</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -35,7 +35,7 @@ class Resources extends React.Component {
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
                                             <Table.Cell>{item.blood_name}</Table.Cell>
-                                            <Table.Cell>{item.quantity}</Table.Cell>
+                                            <Table.Cell>{item.quantity/1000}</Table.Cell>
                                         </Table.Row>
                                     );
                                 })}
