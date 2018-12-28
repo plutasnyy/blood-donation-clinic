@@ -198,7 +198,9 @@ class Workers extends React.Component {
                                         || !this.state.position || !this.state.salary || this.state.salaryError || this.state.isSelected}>
                                     Add
                                 </Button>
-                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
+                                <Button type='submit' color='blue'
+                                        onClick={this.handleUpdate.bind(this)} disabled={this.state.peselError || !this.state.firstName || !this.state.lastName
+                                            || !this.state.position || !this.state.salary || this.state.salaryError || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
@@ -265,10 +267,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        fetchAllWorkers: () => dispatch(actions.fetchAllItems(apiUrl,FETCH_WORKERS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
-        addWorker: payload => dispatch(actions.addItem(payload,apiUrl, ADD_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
-        deleteWorker: id => dispatch(actions.deleteItem(id,apiUrl, DELETE_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
-        updateWorker: payload => dispatch(actions.updateItem(payload,apiUrl, UPDATE_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER))
+        fetchAllWorkers: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_WORKERS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        addWorker: payload => dispatch(actions.addItem(payload, apiUrl, ADD_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        deleteWorker: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        updateWorker: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_WORKER_SUCCESS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER))
     }
 };
 

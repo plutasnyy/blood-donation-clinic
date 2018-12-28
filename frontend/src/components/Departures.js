@@ -132,7 +132,8 @@ class Departures extends React.Component {
                                         disabled={!this.state.place || !this.state.date || this.state.isSelected}>
                                     Add
                                 </Button>
-                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
+                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
+                                        disabled={!this.state.place || !this.state.date || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>

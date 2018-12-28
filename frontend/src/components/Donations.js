@@ -196,7 +196,7 @@ class Donations extends React.Component {
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue'
-                                        disabled={!this.state.patientPesel || !(this.state.date && this.state.workerPesel || this.state.presenceId) }
+                                        disabled={!this.state.patientPesel || !this.state.isSelected || !(this.state.date && this.state.workerPesel || this.state.presenceId) }
                                         onClick={this.handleUpdate.bind(this)}>
                                     Update
                                 </Button>

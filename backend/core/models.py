@@ -62,7 +62,7 @@ class DonateBlood(models.Model):
     date = models.DateField(_("Date"), default=datetime.today)
     patient = models.ForeignKey(Patient, on_delete=models.PROTECT)
     presence = models.ForeignKey(Presence, null=True, blank=True, on_delete=models.PROTECT)
-    worker = models.ForeignKey(Worker, null=True, blank=True, on_delete=models.PROTECT)
+    worker = models.ForeignKey(Worker, on_delete=models.PROTECT)
 
     def __str__(self):
         worker = self.worker
