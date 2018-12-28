@@ -136,7 +136,8 @@ class Presences extends React.Component {
                                         disabled={!this.state.workerId || !this.state.departureId || this.state.isSelected}>
                                     Add
                                 </Button>
-                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
+                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
+                                        disabled={!this.state.workerId || !this.state.departureId || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>

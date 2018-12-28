@@ -178,7 +178,9 @@ class Patients extends React.Component {
                                         || !this.state.bloodId || this.state.isSelected}>
                                     Add
                                 </Button>
-                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}>
+                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
+                                        disabled={this.state.peselError || !this.state.firstName || !this.state.lastName
+                                        || !this.state.bloodId || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
