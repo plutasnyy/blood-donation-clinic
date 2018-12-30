@@ -11,6 +11,7 @@ import Patients from "../components/Patients";
 import Presences from "../components/Presences";
 import Donations from "../components/Donations";
 import Resources from "../components/Resources";
+import Samples from "../components/Samples";
 
 const routes = (
     <div>
@@ -25,6 +26,7 @@ const routes = (
                 <Route path="/presences" component={Presences}/>
                 <Route path="/resources" component={Resources}/>
                 <Route path="/donations" component={Donations}/>
+                <Route path="/samples" component={Samples}/>
                 <Route component={NoMatch}/>
             </Switch>
         </Segment>

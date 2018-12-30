@@ -5,57 +5,40 @@ import {connect} from "react-redux";
 import {Button, Grid, Form, Segment, Input, Table} from "semantic-ui-react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ErrorMessage} from "./ErrorMessage";
-import DayPickerInput from 'react-day-picker/DayPickerInput';
-import 'react-day-picker/lib/style.css';
 import {
-    ADD_DONATION_SUCCESS,
-    DELETE_DONATION_SUCCESS,
-    FETCH_DEPARTURES,
-    FETCH_DONATION, FETCH_PATIENTS, FETCH_PRESENCE,
-    FETCH_WORKERS, GET_DATA_FAILED_DEPARTURE,
-    GET_DATA_FAILED_DONATION, GET_DATA_FAILED_PATIENTS,
-    GET_DATA_FAILED_PRESENCE,
-    GET_DATA_FAILED_WORKER,
-    GET_DATA_REQUESTED_DEPARTURE,
-    GET_DATA_REQUESTED_DONATION, GET_DATA_REQUESTED_PATIENTS, GET_DATA_REQUESTED_PRESENCE,
-    GET_DATA_REQUESTED_WORKER,
-    UPDATE_DONATION_SUCCESS
+    ADD_SAMPLE_SUCCESS,
+    DELETE_SAMPLE_SUCCESS, FETCH_DONATION,
+    FETCH_SAMPLE, GET_DATA_FAILED_DONATION, GET_DATA_FAILED_SAMPLE, GET_DATA_REQUESTED_DONATION,
+    GET_DATA_REQUESTED_SAMPLE,
+    UPDATE_SAMPLE_SUCCESS
 } from "../ActionsTypes";
 
-let apiUrl = 'donates/';
+let apiUrl = 'samples/';
 
 let initialState = {
     id: "",
-    date: "",
-    patientPesel: "",
-    workerPesel: "",
-    presenceId: "",
-    inputType: "presence",
+    size: "",
+    bloodDonationId: "",
+    sizeError: false,
     isSelected: false,
 };
 
-class Donations extends React.Component {
+class Samples extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {...initialState, search: ""};
         this.props.fetchAll();
-        this.props.fetchWorkers();
-        this.props.fetchDepartures();
-        this.props.fetchPatients();
-        this.props.fetchPresences();
+        this.props.fetchBloodDonations();
     }
 
     editItem(item) {
         this.setState({
             isSelected: true,
             id: item.id,
-            date: item.date,
-            patientPesel: item.patient,
-            workerPesel: item.worker,
-            presenceId: item.presence,
+            bloodDonationId: item.donate_blood,
         })
-        if(item.presence == null){
+        if (item.presence == null) {
             this.handleDateWorker(item);
         } else {
             this.handlePresence(item);
@@ -64,10 +47,8 @@ class Donations extends React.Component {
 
     getPayload() {
         let dict = {
-            "date": this.state.date,
-            "patient": this.state.patientPesel,
-            "worker": this.state.workerPesel,
-            "presence": this.state.presenceId,
+            "size": this.state.size,
+            "donate_blood": this.state.bloodDonationId,
         };
         if (this.state.id !== "") {
             dict = {...dict, "id": this.state.id}
@@ -85,14 +66,6 @@ class Donations extends React.Component {
         }
     }
 
-    validatePlace(place) {
-        if (place.length > 30) {
-            this.setState({placeError: true});
-        } else {
-            this.setState({placeError: false});
-        }
-    }
-
     handleAdd() {
         this.validateId();
         this.props.addItem(this.getPayload());
@@ -100,23 +73,6 @@ class Donations extends React.Component {
 
     handleUpdate() {
         this.props.updateItem(this.getPayload());
-    }
-
-    validateDate(date) {
-        if (this.state.presenceId != "") {
-            let p = this.props.presencesItems.filter(p => p.id == this.state.presenceId + '')[0]
-            let d = this.props.departuresItems.filter(d => d.id == p.departure + '')[0]
-            if (d.date != date) {
-                this.setState({dateError: true})
-            }
-        }
-        this.setState({dateError: false})
-    }
-
-    onChangeDate(d) {
-        let date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
-        this.validateDate(date);
-        this.setState({date: date});
     }
 
     resetState() {
@@ -128,10 +84,21 @@ class Donations extends React.Component {
     }
 
     filterSearch(item) {
-        let name = `${item.date} ${item.place}`;
-        if (item.date.includes(this.state.search) || item.place.includes(this.state.search) || name.includes(this.state.search)) {
+        let name = `${item.id} ${item.donate_blood}`;
+        if (name.includes(this.state.search)) {
             return item;
         }
+    }
+    validateSize(size) {
+        if (Samples.isNumber(size) && size >= 1 && size <=500) {
+            this.setState({sizeError: false});
+        } else {
+            this.setState({sizeError: true});
+        }
+    }
+
+    static isNumber(n) {
+        return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
     }
 
     onKeyPress(event) {
@@ -144,6 +111,11 @@ class Donations extends React.Component {
         this.setState({[key]: value});
     }
 
+    onChangeSize(e) {
+        this.setState({size: e.target.value});
+        this.validateSize(e.target.value);
+    }
+
     handleDateWorker(e) {
         this.setState({inputType: "dateWorker", presenceId: ""})
     }
@@ -153,25 +125,6 @@ class Donations extends React.Component {
     }
 
     render() {
-        let formContent = "";
-        if (this.state.inputType === "dateWorker") {
-            formContent = <div>
-                <strong>Date</strong> <br/>
-                < DayPickerInput onDayChange={this.onChangeDate.bind(this)}
-                                 value={this.state.date}/><br/><br/>
-                <Form.Select fluid label='Worker' options={this.props.workersOptions}
-                             placeholder='Worker'
-                             onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
-                             value={this.state.workerPesel} disable={this.state.presenceId}/><br/>
-            </div>
-        } else {
-            formContent = <div>
-                <Form.Select fluid label='Presence' options={this.props.presencesOptions}
-                             placeholder='Presence'
-                             onChange={(e, {value}) => this.handleDropdownChange(value, 'presenceId')}
-                             value={this.state.presenceId}/><br/>
-            </div>
-        }
         return (
             <div>
                 <Grid>
@@ -180,24 +133,20 @@ class Donations extends React.Component {
                             <Form>
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
-                                <Form.Select fluid label='Patient' options={this.props.patientOptions}
-                                             placeholder='Presence'
-                                             onChange={(e, {value}) => this.handleDropdownChange(value, 'patientPesel')}
-                                             value={this.state.patientPesel}/>
-                                <Button.Group>
-                                    <Button onClick={this.handleDateWorker.bind(this)} color={'teal'}>Date &
-                                        Worker</Button>
-                                    <Button.Or/>
-                                    <Button onClick={this.handlePresence.bind(this)} color={'olive'}>Presence</Button>
-                                </Button.Group><br/><br/>
-                                {formContent}
+                                <Form.Input id='form-input-control-size' control={Input} label='Size'
+                                            placeholder='Size'
+                                            value={this.state.size} onChange={this.onChangeSize.bind(this)}
+                                            error={this.state.sizeError}/>
+                                <Form.Select fluid label='Donation' options={this.props.bloodDonationsOptions}
+                                             placeholder='Blood Donation'
+                                             onChange={(e, {value}) => this.handleDropdownChange(value, 'bloodDonationId')}
+                                             value={this.state.bloodDonationId}/><br/>
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={!this.state.patientPesel || this.state.isSelected || !(this.state.date && this.state.workerPesel || this.state.presenceId)}>
+                                        disabled={!this.state.bloodDonationId || !this.state.size || this.state.sizeError || this.state.isSelected}>
                                     Add
                                 </Button>
-                                <Button type='submit' color='blue'
-                                        disabled={!this.state.patientPesel || !this.state.isSelected || !(this.state.date && this.state.workerPesel || this.state.presenceId) }
-                                        onClick={this.handleUpdate.bind(this)}>
+                                <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
+                                        disabled={!this.state.bloodDonationId || !this.state.size || this.state.sizeError || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
@@ -217,10 +166,9 @@ class Donations extends React.Component {
                             <Table.Header>
                                 <Table.Row>
                                     <Table.HeaderCell>Id</Table.HeaderCell>
-                                    <Table.HeaderCell>Date</Table.HeaderCell>
-                                    <Table.HeaderCell>Patient</Table.HeaderCell>
-                                    <Table.HeaderCell>Worker</Table.HeaderCell>
-                                    <Table.HeaderCell>Presence</Table.HeaderCell>
+                                    <Table.HeaderCell>Size</Table.HeaderCell>
+                                    <Table.HeaderCell>Blood Donation</Table.HeaderCell>
+                                    <Table.HeaderCell>Blood Type</Table.HeaderCell>
                                     <Table.HeaderCell>Actions</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
@@ -230,10 +178,9 @@ class Donations extends React.Component {
                                     return (
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
-                                            <Table.Cell>{item.date}</Table.Cell>
-                                            <Table.Cell>{getWorkerFromId(item.patient, this.props.patientsItems)}</Table.Cell>
-                                            <Table.Cell>{getWorkerFromId(item.worker, this.props.workersItems)}</Table.Cell>
-                                            <Table.Cell>{getPresenceFromId(item.presence, this.props.workersItems, this.props.departuresItems, this.props.presencesItems)}</Table.Cell>
+                                            <Table.Cell>{item.size}</Table.Cell>
+                                            <Table.Cell>{item.donate_blood}</Table.Cell>
+                                            <Table.Cell>{item.blood}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit
@@ -254,89 +201,34 @@ class Donations extends React.Component {
     }
 }
 
-function getWorkerFromId(id, workers) {
-    let worker = workers.filter(worker => worker.pesel === (id + ''))[0];
-    if (worker !== undefined) {
-        return `${worker.first_name} ${worker.last_name}`
-    } else {
-        return id
-    }
-}
-
-function getDepartureFromId(id, departures) {
-    let departure = departures.filter(departure => departure.id == id + '')[0];
-    if (departure !== undefined) {
-        return `${departure.place} ${departure.date}`
-    } else {
-        return id;
-    }
-}
-
-function getPresenceFromId(id, workers, departures, presences) {
-    let presence = presences.filter(p => p.id == id + '')[0];
-    if (presence !== undefined) {
-        return getWorkerFromId(presence.worker, workers) + " " + getDepartureFromId(presence.departure, departures);
-    } else {
-        return presence;
-    }
-}
-
-const createWorkersOptions = (workers) => {
-    return workers.map(function (worker) {
+const createDonatesOptions = (donations) => {
+    return donations.map(function (donation) {
         return {
-            key: worker.pesel,
-            value: worker.pesel,
-            text: `${worker.first_name} ${worker.last_name}`,
+            key: donation.id,
+            value: donation.id,
+            text: `${donation.id} ${donation.date} ${donation.patient}`,
         }
     });
 };
 
-const createDeparturesOptions = (departures) => {
-    return departures.map(function (departure) {
-        return {
-            key: departure.id,
-            value: departure.id,
-            text: `${departure.place} ${departure.date}`,
-        }
-    });
-};
-
-const createPresencesOptions = (presences, workers, departures) => {
-    return presences.map(function (presence) {
-        return {
-            key: presence.id,
-            value: presence.id,
-            text: getPresenceFromId(presence.id, workers, departures, presences),
-        }
-    })
-};
 
 const mapStateToProps = (state) => {
     return {
-        workersOptions: createWorkersOptions(state.workersAPI.workers),
-        workersItems: state.workersAPI.workers,
-        patientOptions: createWorkersOptions(state.patientsAPI.patients),
-        patientsItems: state.patientsAPI.patients,
-        departuresOptions: createDeparturesOptions(state.departureAPI.departures),
-        departuresItems: state.departureAPI.departures,
-        presencesOptions: createPresencesOptions(state.presencesAPI.presences, state.workersAPI.workers, state.departureAPI.departures),
-        presencesItems: state.presencesAPI.presences,
-        items: state.donationsAPI.donations,
-        isLoading: state.donationsAPI.isLoading,
-        isError: state.donationsAPI.isError
+        bloodDonationsOptions: createDonatesOptions(state.donationsAPI.donations),
+        bloodDonationsItems: state.donationsAPI.donations,
+        items: state.samplesAPI.samples,
+        isLoading: state.samplesAPI.isLoading,
+        isError: state.samplesAPI.isError
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_DONATION, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION)),
-        fetchWorkers: () => dispatch(actions.fetchAllItems('workers/', FETCH_WORKERS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
-        fetchPatients: () => dispatch(actions.fetchAllItems('patients/', FETCH_PATIENTS, GET_DATA_REQUESTED_PATIENTS, GET_DATA_FAILED_PATIENTS)),
-        fetchPresences: () => dispatch(actions.fetchAllItems('presences/', FETCH_PRESENCE, GET_DATA_REQUESTED_PRESENCE, GET_DATA_FAILED_PRESENCE)),
-        fetchDepartures: () => dispatch(actions.fetchAllItems('departures/', FETCH_DEPARTURES, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
-        addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_DONATION_SUCCESS, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION)),
-        deleteItem: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_DONATION_SUCCESS, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION)),
-        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_DONATION_SUCCESS, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION))
+        fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_SAMPLE, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE)),
+        fetchBloodDonations: () => dispatch(actions.fetchAllItems('/donates', FETCH_DONATION, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION)),
+        addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_SAMPLE_SUCCESS, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE)),
+        deleteItem: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_SAMPLE_SUCCESS, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE)),
+        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_SAMPLE_SUCCESS, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE))
     };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Donations)
+export default connect(mapStateToProps, mapDispatchToProps)(Samples)
