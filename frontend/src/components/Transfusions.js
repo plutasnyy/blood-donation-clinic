@@ -312,20 +312,22 @@ function getSampleNameFromId(id, samples, bloods) {
     }
 }
 
-const createSamplesOptions = (samples, bloods) => {
+const createSamplesOptions = (samples, bloods, donates) => {
     return samples.filter(sample => sample.is_available === true).map(function (sample) {
+        let donate = donates.filter(d => d.id === sample.donate_blood)[0];
+        console.log(donate)
         return {
             key: sample.id,
             value: sample.id,
-            text: getSampleNameFromId(sample.id, samples, bloods)
-        }
+            text: getSampleNameFromId(sample.id, samples, bloods) + " " + donate.date,
+    }
     })
 }
 
 const mapStateToProps = (state) => {
     return {
         samplesItems: state.samplesAPI.samples,
-        samplesOptions: createSamplesOptions(state.samplesAPI.samples, state.bloodTypesAPI.bloodTypes),
+        samplesOptions: createSamplesOptions(state.samplesAPI.samples, state.bloodTypesAPI.bloodTypes, state.donationsAPI.donations),
         bloodItems: state.bloodTypesAPI.bloodTypes,
         donationItems: state.donationsAPI.donations,
         workersOptions: createWorkersOptions(state.workersAPI.workers),
