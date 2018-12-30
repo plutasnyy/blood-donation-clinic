@@ -72,14 +72,38 @@ class Transfusions extends React.Component {
         return dict;
     }
 
-    isIdExist(id) {
-        return this.props.items.filter(item => item.id === id).length > 0;
-    }
+    validateBlood() {
+        let patient = this.props.patientsItems.filter(p => p.pesel === this.state.patientPesel + '')[0]
+        let patientBlood = this.props.bloodItems.filter(b => b.id === patient.blood)[0]
+        let sample = this.props.samplesItems.filter(b => b.id === this.state.sampleId)[0]
+        let sampleBlood = this.props.bloodItems.filter(b => b.id === sample.blood)[0]
 
-    validateId() {
-        if (this.isIdExist(this.state.id)) {
-            this.setState({idError: true})
+
+        if (patientBlood.blood === 'AB' && patientBlood.rh === '+') {
+            return true;
         }
+        if (patientBlood.blood === 'AB' && patientBlood.rh === '-' && sampleBlood.rh === '-') {
+            return true;
+        }
+        if (sampleBlood.blood === '0' && sampleBlood.rh === '-') {
+            return true;
+        }
+        if (sampleBlood.blood === '0' && sampleBlood.rh === '+' && patientBlood.rh === '+') {
+            return true;
+        }
+        if (patientBlood.blood === 'A' && patientBlood.rh === '+' && sampleBlood.blood === 'A') {
+            return true;
+        }
+        if (patientBlood.blood === 'A' && patientBlood.rh === '-' && sampleBlood.blood === 'A' && sampleBlood.rh === '-') {
+            return true;
+        }
+        if (patientBlood.blood === 'B' && patientBlood.rh === '+' && sampleBlood.blood === 'B') {
+            return true;
+        }
+        if (patientBlood.blood === 'B' && patientBlood.rh === '-' && sampleBlood.blood === 'B' && sampleBlood.rh === '-') {
+            return true;
+        }
+        return false;
     }
 
     validateDate() {
@@ -116,7 +140,8 @@ class Transfusions extends React.Component {
     }
 
     handleAdd() {
-        if (this.validateDate()) {
+        this.validateBlood()
+        if (this.validateDate() && this.validateDate()) {
             this.props.addItem(this.getPayload());
             let transfusion = this.getPayload();
             let sample = this.props.samplesItems.filter(sample => sample.id === transfusion.sample)[0];
@@ -126,7 +151,7 @@ class Transfusions extends React.Component {
     }
 
     handleUpdate() {
-        if (this.validateDate()) {
+        if (this.validateDate() && this.validateDate()) {
             this.props.updateItem(this.getPayload());
         }
     }
@@ -315,12 +340,15 @@ function getSampleNameFromId(id, samples, bloods) {
 const createSamplesOptions = (samples, bloods, donates) => {
     return samples.filter(sample => sample.is_available === true).map(function (sample) {
         let donate = donates.filter(d => d.id === sample.donate_blood)[0];
-        console.log(donate)
+        let date = "";
+        if (donate !== undefined) {
+            date = donate.date
+        }
         return {
             key: sample.id,
             value: sample.id,
-            text: getSampleNameFromId(sample.id, samples, bloods) + " " + donate.date,
-    }
+            text: getSampleNameFromId(sample.id, samples, bloods) + " " + date,
+        }
     })
 }
 
