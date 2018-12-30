@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include
 from rest_framework import routers
 
 from api.views import *
+from core.views import resources
 
 router = routers.DefaultRouter()
 router.register(r'workers', WorkerViewSet)
@@ -32,6 +33,7 @@ router.register(r'blood', BloodTypeViewSet)
 
 urlpatterns = [
     url(r'api/', include(router.urls)),
+    url(r'api/resources', resources, name='resources'),
     url(r'admin/', admin.site.urls),
 ]
 

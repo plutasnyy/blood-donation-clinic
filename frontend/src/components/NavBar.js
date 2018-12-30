@@ -53,6 +53,12 @@ class NavBar extends React.Component {
                             Presences
                         </Menu.Item>
                     </Link>
+                    <Link to="/resources">
+                        <Menu.Item name='/resources' active={activeItem === '/resources'}
+                                   onClick={this.handleItemClick}>
+                            Resources
+                        </Menu.Item>
+                    </Link>
                     <Link to="/donations">
                         <Menu.Item name='/donations' active={activeItem === '/donations'}
                                    onClick={this.handleItemClick}>

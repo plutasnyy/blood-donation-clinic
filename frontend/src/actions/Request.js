@@ -7,6 +7,7 @@ export function getDataRequested(requestAction) {
 }
 
 export function fetchSuccess(data, actionType) {
+    console.log(data)
     return {
         type: actionType,
         payload: data
@@ -16,14 +17,14 @@ export function fetchSuccess(data, actionType) {
 export function getDataFailed(error, failedAction) {
     return {
         type: failedAction,
-        payload: error.message
+        payload: error
     };
 }
 
 export function fetchAllItems(apiUrl, actionType, requestAction, failedAction) {
     return dispatch => {
-        dispatch(getDataRequested(requestAction));
         console.log(actionType);
+        dispatch(getDataRequested(requestAction));
         client.get(apiUrl)
             .then(response => {
                 dispatch(fetchSuccess(response.data, actionType));
@@ -71,7 +72,7 @@ export function updateSuccess(data, actionType) {
 export function updateItem(payload, apiUrl, actionType, requestAction, failedAction) {
     return (dispatch) => {
         dispatch(getDataRequested(requestAction));
-        client.put(apiUrl+payload.id+'/', payload).then(response => {
+        client.put(apiUrl + payload.id + '/', payload).then(response => {
             dispatch(updateSuccess(response.data, actionType))
         }).catch((response) => {
             getDataFailed(response.error, failedAction)
