@@ -46,9 +46,25 @@ class DonateBloodViewSet(viewsets.ModelViewSet):
         return super(DonateBloodViewSet, self).update(request, *args, **kwargs)
 
 
+def add_donate_blood_data_to_request(request):
+    blood_donate_id = request.data.get('donate_blood')
+    blood_donate = DonateBlood.objects.get(pk=blood_donate_id)
+    request.data['blood'] = blood_donate.patient.blood.id
+
+
 class SampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.all()
     serializer_class = SampleSerializer
+
+    def create(self, request, *args, **kwargs):
+        if request.data.get('donate_blood') != '':
+            add_donate_blood_data_to_request(request)
+        return super(SampleViewSet, self).create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        if request.data.get('donate_blood') != '':
+            add_donate_blood_data_to_request(request)
+        return super(SampleViewSet, self).update(request, *args, **kwargs)
 
 
 class TransfusionViewSet(viewsets.ModelViewSet):
