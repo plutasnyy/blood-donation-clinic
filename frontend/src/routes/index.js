@@ -12,6 +12,7 @@ import Presences from "../components/Presences";
 import Donations from "../components/Donations";
 import Resources from "../components/Resources";
 import Samples from "../components/Samples";
+import Transfusions from "../components/Transfusions";
 
 const routes = (
     <div>
@@ -27,6 +28,7 @@ const routes = (
                 <Route path="/resources" component={Resources}/>
                 <Route path="/donations" component={Donations}/>
                 <Route path="/samples" component={Samples}/>
+                <Route path="/transfusions" component={Transfusions}/>
                 <Route component={NoMatch}/>
             </Switch>
         </Segment>

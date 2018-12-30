@@ -8,6 +8,7 @@ import presencesReducer from "./Presence";
 import resourcesReducer from "./Resources";
 import donationReducer from "./Donations";
 import samplesReducer from "./Samples";
+import transfusionReducer from "./Transfusions";
 
 const rootReducer = (history) => combineReducers({
     workersAPI: workersReducer,
@@ -18,6 +19,7 @@ const rootReducer = (history) => combineReducers({
     resourcesAPI: resourcesReducer,
     donationsAPI: donationReducer,
     samplesAPI: samplesReducer,
+    transfusionsAPI: transfusionReducer,
     router: connectRouter(history)
 });
 
