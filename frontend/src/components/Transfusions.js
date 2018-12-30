@@ -82,12 +82,33 @@ class Transfusions extends React.Component {
         }
     }
 
-    validatePlace(place) {
-        if (place.length > 30) {
-            this.setState({placeError: true});
-        } else {
-            this.setState({placeError: false});
+    validateDate() {
+        let date = this.state.date
+        let sample = this.props.samplesItems.filter(sample => sample.id === this.state.sampleId)[0];
+        let donation = this.props.donationItems.filter(d => d.id === sample.donate_blood)[0];
+
+        function compare_dates(sample_date, date) {
+            var x = sample_date.split('-')
+            var y = date.split('-')
+            var i;
+            for (i = 0; i < 3; i++) {
+                if (parseInt(x[i]) > parseInt(y[i])) {
+                    return true;
+                }
+            }
+            return false;
         }
+
+        if (donation !== undefined) {
+            let sample_date = donation.date;
+            if (compare_dates(sample_date, date)) {
+                this.setState({dateError: true})
+                return false
+            } else {
+                this.setState({dateError: false})
+            }
+        }
+        return true
     }
 
     handleDropdownChange(value, key) {
@@ -95,30 +116,32 @@ class Transfusions extends React.Component {
     }
 
     handleAdd() {
-        this.validateId();
-        this.props.addItem(this.getPayload());
-
-        let transfusion = this.getPayload();
-        let sample = this.props.samplesItems.filter(sample=>sample.id ===transfusion.sample)[0];
-        sample.is_available = false;
-        this.props.updateSample(sample);
+        if (this.validateDate()) {
+            this.props.addItem(this.getPayload());
+            let transfusion = this.getPayload();
+            let sample = this.props.samplesItems.filter(sample => sample.id === transfusion.sample)[0];
+            sample.is_available = false;
+            this.props.updateSample(sample);
+        }
     }
 
     handleUpdate() {
-        this.props.updateItem(this.getPayload());
+        if (this.validateDate()) {
+            this.props.updateItem(this.getPayload());
+        }
     }
 
-    handleDelete(transfusionId){
+    handleDelete(transfusionId) {
         this.props.deleteItem(transfusionId);
-        let transfusion = this.props.items.filter(trans=>trans.id===transfusionId)[0];
-        let sample = this.props.samplesItems.filter(sample=>sample.id ===transfusion.sample)[0];
+        let transfusion = this.props.items.filter(trans => trans.id === transfusionId)[0];
+        let sample = this.props.samplesItems.filter(sample => sample.id === transfusion.sample)[0];
         sample.is_available = true;
         this.props.updateSample(sample);
 
     }
 
     onChangeDate(d) {
-        let date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
+        let date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
         this.setState({date: date});
     }
 
@@ -144,12 +167,12 @@ class Transfusions extends React.Component {
     }
 
     render() {
-        let sampleForm=""
-        if(!this.state.isSelected){
-            sampleForm=<Form.Select fluid label='Sample' options={this.props.samplesOptions}
-                                    placeholder='Sample'
-                                    onChange={(e, {value}) => this.handleDropdownChange(value, 'sampleId')}
-                                    value={this.state.sampleId}/>
+        let sampleForm = ""
+        if (!this.state.isSelected) {
+            sampleForm = <Form.Select fluid label='Sample' options={this.props.samplesOptions}
+                                      placeholder='Sample' error={this.state.dateError}
+                                      onChange={(e, {value}) => this.handleDropdownChange(value, 'sampleId')}
+                                      value={this.state.sampleId}/>
         }
         return (
             <div>
@@ -160,7 +183,8 @@ class Transfusions extends React.Component {
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
                                 <strong>Date</strong> <br/>
-                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} value={this.state.date}/><br/><br/>
+                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)}
+                                                value={this.state.date}/><br/><br/>
                                 <Form.Select fluid label='Worker' options={this.props.workersOptions}
                                              placeholder='Worker'
                                              onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
@@ -171,11 +195,11 @@ class Transfusions extends React.Component {
                                              value={this.state.patientPesel}/>
                                 {sampleForm}
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.dateError || this.state.sampleIdError || !this.state.sampleId || this.state.isSelected}>
+                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.sampleIdError || !this.state.sampleId || this.state.isSelected}>
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
-                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.dateError || this.state.sampleIdError || !this.state.sampleId || !this.state.isSelected}>
+                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.sampleIdError || !this.state.sampleId || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
@@ -211,7 +235,7 @@ class Transfusions extends React.Component {
                                             <Table.Cell>{item.date}</Table.Cell>
                                             <Table.Cell>{getPatientFromId(item.patient, this.props.patientsItems, this.props.bloodItems)}</Table.Cell>
                                             <Table.Cell>{getWorkerFromId(item.worker, this.props.workersItems)}</Table.Cell>
-                                            <Table.Cell>{getSampleNameFromId(item.sample,this.props.samplesItems, this.props.bloodItems)}</Table.Cell>
+                                            <Table.Cell>{getSampleNameFromId(item.sample, this.props.samplesItems, this.props.bloodItems)}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit
@@ -289,7 +313,7 @@ function getSampleNameFromId(id, samples, bloods) {
 }
 
 const createSamplesOptions = (samples, bloods) => {
-    return samples.filter(sample=>sample.is_available === true).map(function (sample) {
+    return samples.filter(sample => sample.is_available === true).map(function (sample) {
         return {
             key: sample.id,
             value: sample.id,
@@ -303,6 +327,7 @@ const mapStateToProps = (state) => {
         samplesItems: state.samplesAPI.samples,
         samplesOptions: createSamplesOptions(state.samplesAPI.samples, state.bloodTypesAPI.bloodTypes),
         bloodItems: state.bloodTypesAPI.bloodTypes,
+        donationItems: state.donationsAPI.donations,
         workersOptions: createWorkersOptions(state.workersAPI.workers),
         workersItems: state.workersAPI.workers,
         patientOptions: createPatientsOptions(state.patientsAPI.patients, state.bloodTypesAPI.bloodTypes),
