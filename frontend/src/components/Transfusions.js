@@ -1,30 +1,35 @@
 import React from 'react'
 import 'semantic-ui-css/semantic.min.css';
 import * as actions from "../actions/Request";
-import {
-    ADD_DEPARTURE_SUCCESS,
-    DELETE_DEPARTURE_SUCCESS,
-    FETCH_DEPARTURES,
-    GET_DATA_FAILED_DEPARTURE,
-    GET_DATA_REQUESTED_DEPARTURE,
-    UPDATE_DEPARTURE_SUCCESS
-} from "../ActionsTypes";
 import {connect} from "react-redux";
 import {Button, Grid, Form, Segment, Input, Table} from "semantic-ui-react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ErrorMessage} from "./ErrorMessage";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
+import {
+    ADD_TRANSFUSION_SUCCESS,
+    DELETE_TRANSFUSION_SUCCESS, FETCH_BLOOD_TYPES, FETCH_DONATION,
+    FETCH_PATIENTS, FETCH_SAMPLE,
+    FETCH_TRANSFUSION, FETCH_WORKERS, GET_DATA_FAILED_BLOOD, GET_DATA_FAILED_DONATION,
+    GET_DATA_FAILED_PATIENTS, GET_DATA_FAILED_SAMPLE,
+    GET_DATA_FAILED_TRANSFUSION, GET_DATA_FAILED_WORKER, GET_DATA_REQUESTED_BLOOD, GET_DATA_REQUESTED_DONATION,
+    GET_DATA_REQUESTED_PATIENTS, GET_DATA_REQUESTED_SAMPLE,
+    GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_REQUESTED_WORKER,
+    UPDATE_TRANSFUSION_SUCCESS
+} from "../ActionsTypes";
 
-let apiUrl = 'departures/';
+let apiUrl = 'transfusions/';
 
 let initialState = {
     id: "",
     date: "",
-    place: "",
+    workerPesel: "",
+    patientPesel: "",
+    sampleId: "",
     idError: false,
     dateError: false,
-    placeError: false,
+    sampleIdError: false,
     isSelected: false,
 };
 
@@ -34,21 +39,31 @@ class Transfusions extends React.Component {
         super(props);
         this.state = {...initialState, search: ""};
         this.props.fetchAll();
+        this.props.fetchPatients();
+        this.props.fetchWorkers();
+        this.props.fetchBlood();
+        this.props.fetchBloodDonations();
+        this.props.fetchSamples();
     }
 
     editItem(item) {
+        console.log(item)
         this.setState({
             isSelected: true,
             id: item.id,
             date: item.date,
-            place: item.place,
+            workerPesel: item.worker,
+            patientPesel: item.patient,
+            sampleId: item.sample,
         })
     }
 
     getPayload() {
         let dict = {
             "date": this.state.date,
-            "place": this.state.place,
+            "sample": this.state.sampleId,
+            "worker": this.state.workerPesel,
+            "patient": this.state.patientPesel,
         };
         if (this.state.id !== "") {
             dict = {...dict, "id": this.state.id}
@@ -74,6 +89,10 @@ class Transfusions extends React.Component {
         }
     }
 
+    handleDropdownChange(value, key) {
+        this.setState({[key]: value});
+    }
+
     handleAdd() {
         this.validateId();
         this.props.addItem(this.getPayload());
@@ -89,7 +108,7 @@ class Transfusions extends React.Component {
     }
 
     onChangeDate(d) {
-        let date =  `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`
+        let date = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`
         this.setState({date: date});
     }
 
@@ -115,6 +134,13 @@ class Transfusions extends React.Component {
     }
 
     render() {
+        let sampleForm=""
+        if(!this.state.isSelected){
+            sampleForm=<Form.Select fluid label='Sample' options={this.props.samplesOptions}
+                                    placeholder='Sample'
+                                    onChange={(e, {value}) => this.handleDropdownChange(value, 'sampleId')}
+                                    value={this.state.sampleId}/>
+        }
         return (
             <div>
                 <Grid>
@@ -123,17 +149,23 @@ class Transfusions extends React.Component {
                             <Form>
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
-                                <strong>Date</strong>   <br/>
-                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} /><br/><br/>
-                                <Form.Input id='form-input-control-place' control={Input} label='Place' placeholder='Place'
-                                            value={this.state.place} onChange={this.onChangePlace.bind(this)}
-                                            error={this.state.placeError}/>
+                                <strong>Date</strong> <br/>
+                                <DayPickerInput onDayChange={this.onChangeDate.bind(this)} value={this.state.date}/><br/><br/>
+                                <Form.Select fluid label='Worker' options={this.props.workersOptions}
+                                             placeholder='Worker'
+                                             onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
+                                             value={this.state.workerPesel}/>
+                                <Form.Select fluid label='Patient' options={this.props.patientOptions}
+                                             placeholder='Patient'
+                                             onChange={(e, {value}) => this.handleDropdownChange(value, 'patientPesel')}
+                                             value={this.state.patientPesel}/>
+                                {sampleForm}
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={!this.state.place || !this.state.date || this.state.isSelected}>
+                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.dateError || this.state.sampleIdError || !this.state.sampleId || this.state.isSelected}>
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
-                                        disabled={!this.state.place || !this.state.date || !this.state.isSelected}>
+                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.dateError || this.state.sampleIdError || !this.state.sampleId || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
@@ -154,8 +186,10 @@ class Transfusions extends React.Component {
                                 <Table.Row>
                                     <Table.HeaderCell>id</Table.HeaderCell>
                                     <Table.HeaderCell>Date</Table.HeaderCell>
-                                    <Table.HeaderCell>Place</Table.HeaderCell>
-                                    <Table.HeaderCell>Action</Table.HeaderCell>
+                                    <Table.HeaderCell>Patient</Table.HeaderCell>
+                                    <Table.HeaderCell>Worker</Table.HeaderCell>
+                                    <Table.HeaderCell>Sample</Table.HeaderCell>
+                                    <Table.HeaderCell>Actions</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
 
@@ -165,7 +199,9 @@ class Transfusions extends React.Component {
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
                                             <Table.Cell>{item.date}</Table.Cell>
-                                            <Table.Cell>{item.place}</Table.Cell>
+                                            <Table.Cell>{getPatientFromId(item.patient, this.props.patientsItems, this.props.bloodItems)}</Table.Cell>
+                                            <Table.Cell>{getWorkerFromId(item.worker, this.props.workersItems)}</Table.Cell>
+                                            <Table.Cell>{getSampleNameFromId(item.sample,this.props.samplesItems, this.props.bloodItems)}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit
@@ -186,20 +222,98 @@ class Transfusions extends React.Component {
     }
 }
 
+function getBloodNameFromId(b, bloodItems) {
+    let bloodItem = bloodItems.filter(blood => blood.id === b)[0];
+    if (bloodItem !== undefined) {
+        return `${bloodItem.blood} Rh${bloodItem.rh}`
+    } else {
+        return b
+    }
+}
+
+function getWorkerFromId(id, workers) {
+    let worker = workers.filter(worker => worker.pesel === (id + ''))[0];
+    if (worker !== undefined) {
+        return `${worker.first_name} ${worker.last_name}`
+    } else {
+        return id
+    }
+}
+
+function getPatientFromId(id, patients, bloods) {
+    let patient = patients.filter(patient => patient.pesel === (id + ''))[0];
+    if (patient !== undefined) {
+        return `${patient.first_name} ${patient.last_name} ${getBloodNameFromId(patient.blood, bloods)}`
+    } else {
+        return id
+    }
+}
+
+const createWorkersOptions = (workers) => {
+    return workers.map(function (worker) {
+        return {
+            key: worker.pesel,
+            value: worker.pesel,
+            text: `${getWorkerFromId(worker.pesel, workers)}`,
+        }
+    });
+};
+
+const createPatientsOptions = (patients, bloods) => {
+    return patients.map(function (patient) {
+        return {
+            key: patient.pesel,
+            value: patient.pesel,
+            text: `${getPatientFromId(patient.pesel, patients, bloods)}`,
+        }
+    });
+};
+
+function getSampleNameFromId(id, samples, bloods) {
+    let sample = samples.filter(sample => sample.id === id)[0];
+    if (sample !== undefined) {
+        return `${sample.size} ${getBloodNameFromId(sample.blood, bloods)}`
+    } else {
+        return id
+    }
+}
+
+const createSamplesOptions = (samples, bloods) => {
+    return samples.filter(sample=>sample.is_available === true).map(function (sample) {
+        return {
+            key: sample.id,
+            value: sample.id,
+            text: getSampleNameFromId(sample.id, samples, bloods)
+        }
+    })
+}
+
 const mapStateToProps = (state) => {
     return {
-        items: state.departureAPI.departures,
-        isLoading: state.departureAPI.isLoading,
-        isError: state.departureAPI.isError
+        samplesItems: state.samplesAPI.samples,
+        samplesOptions: createSamplesOptions(state.samplesAPI.samples, state.bloodTypesAPI.bloodTypes),
+        bloodItems: state.bloodTypesAPI.bloodTypes,
+        workersOptions: createWorkersOptions(state.workersAPI.workers),
+        workersItems: state.workersAPI.workers,
+        patientOptions: createPatientsOptions(state.patientsAPI.patients, state.bloodTypesAPI.bloodTypes),
+        patientsItems: state.patientsAPI.patients,
+        items: state.transfusionsAPI.transfusions,
+        isLoading: state.transfusionsAPI.isLoading,
+        isError: state.transfusionsAPI.isError
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_DEPARTURES, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
-        addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_DEPARTURE_SUCCESS, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
-        deleteItem: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_DEPARTURE_SUCCESS, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE)),
-        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_DEPARTURE_SUCCESS, GET_DATA_REQUESTED_DEPARTURE, GET_DATA_FAILED_DEPARTURE))
+        fetchWorkers: () => dispatch(actions.fetchAllItems('workers/', FETCH_WORKERS, GET_DATA_REQUESTED_WORKER, GET_DATA_FAILED_WORKER)),
+        fetchPatients: () => dispatch(actions.fetchAllItems('patients/', FETCH_PATIENTS, GET_DATA_REQUESTED_PATIENTS, GET_DATA_FAILED_PATIENTS)),
+        fetchBlood: () => dispatch(actions.fetchAllItems('blood/', FETCH_BLOOD_TYPES, GET_DATA_REQUESTED_BLOOD, GET_DATA_FAILED_BLOOD)),
+        fetchSamples: () => dispatch(actions.fetchAllItems('samples/', FETCH_SAMPLE, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE)),
+        fetchBloodDonations: () => dispatch(actions.fetchAllItems('/donates', FETCH_DONATION, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION)),
+        fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_TRANSFUSION, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
+        addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
+        deleteItem: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
+        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION))
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Transfusions)

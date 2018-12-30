@@ -1,7 +1,7 @@
 import json
 
 from django.db import connection
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 
 from core.models import BloodType
 

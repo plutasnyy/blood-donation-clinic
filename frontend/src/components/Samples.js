@@ -173,6 +173,7 @@ class Samples extends React.Component {
                                     <Table.HeaderCell>Id</Table.HeaderCell>
                                     <Table.HeaderCell>Size</Table.HeaderCell>
                                     <Table.HeaderCell>Blood Donation</Table.HeaderCell>
+                                    <Table.HeaderCell>Is available?</Table.HeaderCell>
                                     <Table.HeaderCell>Actions</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
@@ -184,6 +185,7 @@ class Samples extends React.Component {
                                             <Table.Cell>{item.id}</Table.Cell>
                                             <Table.Cell>{item.size}</Table.Cell>
                                             <Table.Cell>{getDonationFromId(item.donate_blood, this.props.bloodDonationsItems, this.props.patientsItems, this.props.bloodItems)}</Table.Cell>
+                                            <Table.Cell>{item.is_available ? 'YES' : 'NO'}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit

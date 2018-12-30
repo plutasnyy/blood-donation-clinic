@@ -1,3 +1,7 @@
+import json
+
+from django.db import connection
+from django.http import HttpResponse
 from rest_framework import viewsets
 
 from api.serializers import *
@@ -67,23 +71,37 @@ class SampleViewSet(viewsets.ModelViewSet):
         return super(SampleViewSet, self).update(request, *args, **kwargs)
 
 
+def set_is_avaible_in_sample(sample_id, value):
+    sample = Sample.objects.get(pk=sample_id)
+    sample.is_available = value
+    sample.save(update_fields=['is_available'])
+
+
 class TransfusionViewSet(viewsets.ModelViewSet):
     queryset = Transfusion.objects.all()
     serializer_class = TransfusionSerializer
 
     def create(self, request, *args, **kwargs):
-        sample_id = request.data.get('sample')
-        sample = Sample.objects.get(pk=sample_id)
-        sample.is_available = False
-        sample.save(update_fields=['is_available'])
-        return super(TransfusionViewSet, self).create(request, *args, **kwargs)
+        set_is_avaible_in_sample(request.data.get('sample'), False)
+        with connection.cursor() as cursor:
+            pid, sid, wid, date = request.data.get('patient'), request.data.get('sample'), request.data.get(
+                'worker'), request.data.get('date')
+            cursor.callproc('performtransfusion', [pid, sid, wid, date])
+        transfusion = Transfusion.objects.latest('id')
+        response = {
+            'id':transfusion.id,
+            'date':transfusion.date.strftime('%Y-%m-%d'),
+            'patient':transfusion.patient.pesel,
+            'worker':transfusion.worker.pesel,
+            'sample':transfusion.sample.id
+        }
+        return HttpResponse(json.dumps(response))
 
-    def update(self, request, *args, **kwargs):
-        sample_id = request.data.get('sample')
-        sample = Sample.objects.get(pk=sample_id)
-        sample.is_available = False
-        sample.save(update_fields=['is_available'])
-        return super(TransfusionViewSet, self).update(request, *args, **kwargs)
+    def destroy(self, request, *args, **kwargs):
+        transufsion_id = int(request.path.split('/')[-2])
+        transufsion = Transfusion.objects.get(pk=transufsion_id)
+        set_is_avaible_in_sample(transufsion.sample.id, True)
+        return super(TransfusionViewSet, self).destroy(request, *args, **kwargs)
 
 
 class BloodTypeViewSet(viewsets.ModelViewSet):
