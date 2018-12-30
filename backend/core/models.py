@@ -76,6 +76,7 @@ class Sample(models.Model):
     donate_blood = models.ForeignKey(DonateBlood, on_delete=models.PROTECT)
     size = models.PositiveIntegerField(validators=[MaxValueValidator(500)])
     blood = models.ForeignKey(BloodType, on_delete=models.PROTECT)
+    is_available = models.BooleanField(default=True)
 
     def __str__(self):
         return "{} {}ml {}".format(self.blood, self.size, self.donate_blood)

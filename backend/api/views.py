@@ -71,6 +71,20 @@ class TransfusionViewSet(viewsets.ModelViewSet):
     queryset = Transfusion.objects.all()
     serializer_class = TransfusionSerializer
 
+    def create(self, request, *args, **kwargs):
+        sample_id = request.data.get('sample')
+        sample = Sample.objects.get(pk=sample_id)
+        sample.is_available = False
+        sample.save(update_fields=['is_available'])
+        return super(TransfusionViewSet, self).create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        sample_id = request.data.get('sample')
+        sample = Sample.objects.get(pk=sample_id)
+        sample.is_available = False
+        sample.save(update_fields=['is_available'])
+        return super(TransfusionViewSet, self).update(request, *args, **kwargs)
+
 
 class BloodTypeViewSet(viewsets.ModelViewSet):
     queryset = BloodType.objects.all()
