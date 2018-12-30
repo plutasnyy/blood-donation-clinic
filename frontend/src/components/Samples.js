@@ -7,8 +7,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {ErrorMessage} from "./ErrorMessage";
 import {
     ADD_SAMPLE_SUCCESS,
-    DELETE_SAMPLE_SUCCESS, FETCH_DONATION,
-    FETCH_SAMPLE, GET_DATA_FAILED_DONATION, GET_DATA_FAILED_SAMPLE, GET_DATA_REQUESTED_DONATION,
+    DELETE_SAMPLE_SUCCESS,
+    FETCH_BLOOD_TYPES,
+    FETCH_DONATION, FETCH_PATIENTS,
+    FETCH_SAMPLE, GET_DATA_FAILED_BLOOD,
+    GET_DATA_FAILED_DONATION, GET_DATA_FAILED_PATIENTS,
+    GET_DATA_FAILED_SAMPLE,
+    GET_DATA_REQUESTED_BLOOD,
+    GET_DATA_REQUESTED_DONATION, GET_DATA_REQUESTED_PATIENTS,
     GET_DATA_REQUESTED_SAMPLE,
     UPDATE_SAMPLE_SUCCESS
 } from "../ActionsTypes";
@@ -29,20 +35,18 @@ class Samples extends React.Component {
         super(props);
         this.state = {...initialState, search: ""};
         this.props.fetchAll();
+        this.props.fetchBlood();
         this.props.fetchBloodDonations();
+        this.props.fetchPatients();
     }
 
     editItem(item) {
         this.setState({
             isSelected: true,
             id: item.id,
+            size: item.size,
             bloodDonationId: item.donate_blood,
         })
-        if (item.presence == null) {
-            this.handleDateWorker(item);
-        } else {
-            this.handlePresence(item);
-        }
     }
 
     getPayload() {
@@ -84,13 +88,14 @@ class Samples extends React.Component {
     }
 
     filterSearch(item) {
-        let name = `${item.id} ${item.donate_blood}`;
+        let name = `${item.id} ${item.size} ${getDonationFromId(item.donate_blood, this.props.bloodDonationsItems, this.props.patientsItems, this.props.bloodItems)} `;
         if (name.includes(this.state.search)) {
             return item;
         }
     }
+
     validateSize(size) {
-        if (Samples.isNumber(size) && size >= 1 && size <=500) {
+        if (Samples.isNumber(size) && size >= 1 && size <= 500) {
             this.setState({sizeError: false});
         } else {
             this.setState({sizeError: true});
@@ -168,7 +173,6 @@ class Samples extends React.Component {
                                     <Table.HeaderCell>Id</Table.HeaderCell>
                                     <Table.HeaderCell>Size</Table.HeaderCell>
                                     <Table.HeaderCell>Blood Donation</Table.HeaderCell>
-                                    <Table.HeaderCell>Blood Type</Table.HeaderCell>
                                     <Table.HeaderCell>Actions</Table.HeaderCell>
                                 </Table.Row>
                             </Table.Header>
@@ -179,8 +183,7 @@ class Samples extends React.Component {
                                         <Table.Row key={index}>
                                             <Table.Cell>{item.id}</Table.Cell>
                                             <Table.Cell>{item.size}</Table.Cell>
-                                            <Table.Cell>{item.donate_blood}</Table.Cell>
-                                            <Table.Cell>{item.blood}</Table.Cell>
+                                            <Table.Cell>{getDonationFromId(item.donate_blood, this.props.bloodDonationsItems, this.props.patientsItems, this.props.bloodItems)}</Table.Cell>
                                             <Table.Cell>
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit
@@ -201,12 +204,39 @@ class Samples extends React.Component {
     }
 }
 
-const createDonatesOptions = (donations) => {
+function getBloodNameFromId(b, bloodItems) {
+    let bloodItem = bloodItems.filter(blood => blood.id === b)[0];
+    if (bloodItem !== undefined) {
+        return `${bloodItem.blood} Rh${bloodItem.rh}`
+    } else {
+        return b
+    }
+}
+
+function getPatientFromId(id, patients, bloods) {
+    let patient = patients.filter(patient => patient.pesel === (id + ''))[0];
+    if (patient !== undefined) {
+        return `${patient.first_name} ${patient.last_name} ${getBloodNameFromId(patient.blood, bloods)}`
+    } else {
+        return id
+    }
+}
+
+function getDonationFromId(id, donations, patients, bloods) {
+    let donation = donations.filter(donation => donation.id === id)[0];
+    if (donation !== undefined) {
+        return `${donation.date} ${getPatientFromId(donation.patient, patients, bloods)}`
+    } else {
+        return id
+    }
+}
+
+const createDonatesOptions = (donations, patients, bloods) => {
     return donations.map(function (donation) {
         return {
             key: donation.id,
             value: donation.id,
-            text: `${donation.id} ${donation.date} ${donation.patient}`,
+            text: getDonationFromId(donation.id, donations, patients, bloods),
         }
     });
 };
@@ -214,8 +244,10 @@ const createDonatesOptions = (donations) => {
 
 const mapStateToProps = (state) => {
     return {
-        bloodDonationsOptions: createDonatesOptions(state.donationsAPI.donations),
+        bloodDonationsOptions: createDonatesOptions(state.donationsAPI.donations, state.patientsAPI.patients, state.bloodTypesAPI.bloodTypes),
         bloodDonationsItems: state.donationsAPI.donations,
+        bloodItems: state.bloodTypesAPI.bloodTypes,
+        patientsItems: state.patientsAPI.patients,
         items: state.samplesAPI.samples,
         isLoading: state.samplesAPI.isLoading,
         isError: state.samplesAPI.isError
@@ -224,6 +256,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        fetchPatients: () => dispatch(actions.fetchAllItems('patients/', FETCH_PATIENTS, GET_DATA_REQUESTED_PATIENTS, GET_DATA_FAILED_PATIENTS)),
+        fetchBlood: () => dispatch(actions.fetchAllItems('blood/', FETCH_BLOOD_TYPES, GET_DATA_REQUESTED_BLOOD, GET_DATA_FAILED_BLOOD)),
         fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_SAMPLE, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE)),
         fetchBloodDonations: () => dispatch(actions.fetchAllItems('/donates', FETCH_DONATION, GET_DATA_REQUESTED_DONATION, GET_DATA_FAILED_DONATION)),
         addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_SAMPLE_SUCCESS, GET_DATA_REQUESTED_SAMPLE, GET_DATA_FAILED_SAMPLE)),
