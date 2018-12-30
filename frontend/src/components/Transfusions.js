@@ -18,6 +18,7 @@ import {
     GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_REQUESTED_WORKER,
     UPDATE_TRANSFUSION_SUCCESS
 } from "../ActionsTypes";
+import {updateSample} from "../actions/Samples";
 
 let apiUrl = 'transfusions/';
 
@@ -96,15 +97,24 @@ class Transfusions extends React.Component {
     handleAdd() {
         this.validateId();
         this.props.addItem(this.getPayload());
+
+        let transfusion = this.getPayload();
+        let sample = this.props.samplesItems.filter(sample=>sample.id ===transfusion.sample)[0];
+        sample.is_available = false;
+        this.props.updateSample(sample);
     }
 
     handleUpdate() {
         this.props.updateItem(this.getPayload());
     }
 
-    onChangePlace(e) {
-        this.setState({place: e.target.value});
-        this.validatePlace(e.target.value)
+    handleDelete(transfusionId){
+        this.props.deleteItem(transfusionId);
+        let transfusion = this.props.items.filter(trans=>trans.id===transfusionId)[0];
+        let sample = this.props.samplesItems.filter(sample=>sample.id ===transfusion.sample)[0];
+        sample.is_available = true;
+        this.props.updateSample(sample);
+
     }
 
     onChangeDate(d) {
@@ -206,7 +216,7 @@ class Transfusions extends React.Component {
                                                 <Button color='blue' onClick={() => this.editItem(item)}>
                                                     Edit
                                                 </Button>
-                                                <Button color='red' onClick={() => this.props.deleteItem(item.id)}>
+                                                <Button color='red' onClick={() => this.handleDelete(item.id)}>
                                                     Delete
                                                 </Button>
                                             </Table.Cell>
@@ -313,7 +323,8 @@ const mapDispatchToProps = (dispatch) => {
         fetchAll: () => dispatch(actions.fetchAllItems(apiUrl, FETCH_TRANSFUSION, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
         addItem: payload => dispatch(actions.addItem(payload, apiUrl, ADD_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
         deleteItem: id => dispatch(actions.deleteItem(id, apiUrl, DELETE_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
-        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION))
+        updateItem: payload => dispatch(actions.updateItem(payload, apiUrl, UPDATE_TRANSFUSION_SUCCESS, GET_DATA_REQUESTED_TRANSFUSION, GET_DATA_FAILED_TRANSFUSION)),
+        updateSample: sample => dispatch(updateSample(sample))
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Transfusions)
