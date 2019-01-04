@@ -9,7 +9,7 @@ export const ErrorMessage = ({error}) => {
                     error
                     header='You are trying to do something forbidden.'
                     list={['Find if it is not a foreign key for other object']}
-                />
+                />  
                 : null}
         </div>
     )
