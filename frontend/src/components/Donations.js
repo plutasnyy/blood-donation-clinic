@@ -121,7 +121,6 @@ class Donations extends React.Component {
     filterSearch(item) {
         let presenceString = item.presence == undefined ? "" : getPresenceFromId(item.presence, this.props.workersItems, this.props.departuresItems, this.props.presencesItems);
         let name = `${item.date} ${getWorkerFromId(item.patient, this.props.patientsItems)} ${getWorkerFromId(item.worker, this.props.workersItems)} ${presenceString}`;
-        console.log(name);
         if (name.includes(this.state.search)) {
             return item;
         }
@@ -135,7 +134,6 @@ class Donations extends React.Component {
 
 
     validatePesel() {
-        console.log(this.state)
         if (this.state.patientPesel == this.state.workerPesel) {
             this.setState({peselError: true})
             return false

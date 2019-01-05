@@ -50,7 +50,6 @@ class Transfusions extends React.Component {
     }
 
     editItem(item) {
-        console.log(item)
         this.setState({
             isSelected: true,
             id: item.id,
@@ -129,7 +128,6 @@ class Transfusions extends React.Component {
 
         if (donation !== undefined) {
             let sample_date = donation.date;
-            console.log(sample_date, date)
             if (compare_dates(sample_date, date)) {
                 this.setState({dateError: true})
                 return false
@@ -195,7 +193,6 @@ class Transfusions extends React.Component {
 
     filterSearch(item) {
         let name = `${item.id} ${getPatientFromId(item.patient, this.props.patientsItems, this.props.bloodItems)} ${getWorkerFromId(item.worker, this.props.workersItems)} ${getSampleNameFromId(item.sample, this.props.samplesItems, this.props.bloodItems)}`;
-        console.log(name)
         if (name.includes(this.state.search)) {
             return item;
         }

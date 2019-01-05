@@ -62,7 +62,6 @@ export function deleteItem(id, apiUrl, actionType, requestAction, failedAction) 
         client.delete(apiUrl + id + '/')
             .then(response => dispatch(deleteSuccess(id, actionType)))
             .catch(response => {
-                console.log(response.response);
                 dispatch(getDataFailed(response, failedAction))
             });
     }
