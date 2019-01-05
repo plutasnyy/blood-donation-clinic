@@ -82,12 +82,22 @@ class Donations extends React.Component {
 
 
     handleAdd() {
+        if(this.state.inputType === "presence"){
+            if(!this.validatePeselWithPresence()){
+                return;
+            }
+        }
         if (this.validatePesel()) {
             this.props.addItem(this.getPayload());
         }
     }
 
     handleUpdate() {
+        if(this.state.inputType === "presence"){
+            if(!this.validatePeselWithPresence()){
+                return;
+            }
+        }
         if (this.validatePesel()) {
             this.props.updateItem(this.getPayload());
         }
@@ -132,6 +142,18 @@ class Donations extends React.Component {
         }
     }
 
+
+    validatePeselWithPresence() {
+        let presence = this.props.presencesItems.filter(p => p.id == this.state.presenceId + '')[0];
+        let workerPesel = presence.worker;
+        if (this.state.patientPesel == workerPesel) {
+            this.setState({peselError: true})
+            return false
+        } else {
+            this.setState({peselError: false})
+            return true
+        }
+    }
 
     validatePesel() {
         if (this.state.patientPesel == this.state.workerPesel) {
@@ -256,6 +278,7 @@ class Donations extends React.Component {
             </div>
         )
     }
+
 }
 
 function getWorkerFromId(id, workers) {
