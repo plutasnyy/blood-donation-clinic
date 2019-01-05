@@ -153,7 +153,7 @@ class Workers extends React.Component {
     }
 
     filterSearchWork(worker) {
-        let name = worker.first_name + " " + worker.last_name;
+        let name = worker.first_name + " " + worker.last_name + " " + worker.position + " " + worker.salary;
         if (worker.pesel.includes(this.state.search) || name.includes(this.state.search)) {
             return worker;
         }
@@ -199,8 +199,9 @@ class Workers extends React.Component {
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue'
-                                        onClick={this.handleUpdate.bind(this)} disabled={this.state.peselError || !this.state.firstName || !this.state.lastName
-                                            || !this.state.position || !this.state.salary || this.state.salaryError || !this.state.isSelected}>
+                                        onClick={this.handleUpdate.bind(this)}
+                                        disabled={this.state.peselError || !this.state.firstName || !this.state.lastName
+                                        || !this.state.position || !this.state.salary || this.state.salaryError || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
