@@ -30,6 +30,8 @@ let initialState = {
     sampleId: "",
     idError: false,
     dateError: false,
+    patientPeselError: false,
+    workerPeselError: false,
     sampleIdError: false,
     isSelected: false,
 };
@@ -118,6 +120,8 @@ class Transfusions extends React.Component {
             for (i = 0; i < 3; i++) {
                 if (parseInt(x[i]) > parseInt(y[i])) {
                     return true;
+                } else if (parseInt(x[i]) < parseInt(y[i])) {
+                    return false;
                 }
             }
             return false;
@@ -125,6 +129,7 @@ class Transfusions extends React.Component {
 
         if (donation !== undefined) {
             let sample_date = donation.date;
+            console.log(sample_date, date)
             if (compare_dates(sample_date, date)) {
                 this.setState({dateError: true})
                 return false
@@ -135,13 +140,23 @@ class Transfusions extends React.Component {
         return true
     }
 
+    validatePesel() {
+        if (this.state.patientPesel == this.state.workerPesel) {
+            this.setState({patientPeselError: true, workerPeselError: true})
+            return false
+        } else {
+            this.setState({patientPeselError: false, workerPeselError: false})
+            return true
+        }
+
+    }
+
     handleDropdownChange(value, key) {
         this.setState({[key]: value});
     }
 
     handleAdd() {
-        this.validateBlood()
-        if (this.validateDate() && this.validateDate()) {
+        if (this.validateDate() && this.validateBlood() && this.validatePesel()) {
             this.props.addItem(this.getPayload());
             let transfusion = this.getPayload();
             let sample = this.props.samplesItems.filter(sample => sample.id === transfusion.sample)[0];
@@ -151,7 +166,7 @@ class Transfusions extends React.Component {
     }
 
     handleUpdate() {
-        if (this.validateDate() && this.validateDate()) {
+        if (this.validateDate() && this.validateDate() && this.validatePesel()) {
             this.props.updateItem(this.getPayload());
         }
     }
@@ -179,8 +194,9 @@ class Transfusions extends React.Component {
     }
 
     filterSearch(item) {
-        let name = `${item.date} ${item.place}`;
-        if (item.date.includes(this.state.search) || item.place.includes(this.state.search) || name.includes(this.state.search)) {
+        let name = `${item.id} ${getPatientFromId(item.patient, this.props.patientsItems, this.props.bloodItems)} ${getWorkerFromId(item.worker, this.props.workersItems)} ${getSampleNameFromId(item.sample, this.props.samplesItems, this.props.bloodItems)}`;
+        console.log(name)
+        if (name.includes(this.state.search)) {
             return item;
         }
     }
@@ -211,11 +227,11 @@ class Transfusions extends React.Component {
                                 <DayPickerInput onDayChange={this.onChangeDate.bind(this)}
                                                 value={this.state.date}/><br/><br/>
                                 <Form.Select fluid label='Worker' options={this.props.workersOptions}
-                                             placeholder='Worker'
+                                             placeholder='Worker' error={this.state.workerPeselError}
                                              onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
                                              value={this.state.workerPesel}/>
                                 <Form.Select fluid label='Patient' options={this.props.patientOptions}
-                                             placeholder='Patient'
+                                             placeholder='Patient' error={this.state.patientPeselError}
                                              onChange={(e, {value}) => this.handleDropdownChange(value, 'patientPesel')}
                                              value={this.state.patientPesel}/>
                                 {sampleForm}
