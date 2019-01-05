@@ -31,6 +31,7 @@ let initialState = {
     workerPesel: "",
     presenceId: "",
     inputType: "presence",
+    peselError: false,
     isSelected: false,
 };
 
@@ -55,7 +56,7 @@ class Donations extends React.Component {
             workerPesel: item.worker,
             presenceId: item.presence,
         })
-        if(item.presence == null){
+        if (item.presence == null) {
             this.handleDateWorker(item);
         } else {
             this.handlePresence(item);
@@ -79,27 +80,17 @@ class Donations extends React.Component {
         return this.props.items.filter(item => item.id === id).length > 0;
     }
 
-    validateId() {
-        if (this.isIdExist(this.state.id)) {
-            this.setState({idError: true})
-        }
-    }
-
-    validatePlace(place) {
-        if (place.length > 30) {
-            this.setState({placeError: true});
-        } else {
-            this.setState({placeError: false});
-        }
-    }
 
     handleAdd() {
-        this.validateId();
-        this.props.addItem(this.getPayload());
+        if (this.validatePesel()) {
+            this.props.addItem(this.getPayload());
+        }
     }
 
     handleUpdate() {
-        this.props.updateItem(this.getPayload());
+        if (this.validatePesel()) {
+            this.props.updateItem(this.getPayload());
+        }
     }
 
     validateDate(date) {
@@ -128,8 +119,10 @@ class Donations extends React.Component {
     }
 
     filterSearch(item) {
-        let name = `${item.date} ${item.place}`;
-        if (item.date.includes(this.state.search) || item.place.includes(this.state.search) || name.includes(this.state.search)) {
+        let presenceString = item.presence == undefined ? "" : getPresenceFromId(item.presence, this.props.workersItems, this.props.departuresItems, this.props.presencesItems);
+        let name = `${item.date} ${getWorkerFromId(item.patient, this.props.patientsItems)} ${getWorkerFromId(item.worker, this.props.workersItems)} ${presenceString}`;
+        console.log(name);
+        if (name.includes(this.state.search)) {
             return item;
         }
     }
@@ -138,6 +131,19 @@ class Donations extends React.Component {
         if (event.which === 13 /* Enter */) {
             event.preventDefault();
         }
+    }
+
+
+    validatePesel() {
+        console.log(this.state)
+        if (this.state.patientPesel == this.state.workerPesel) {
+            this.setState({peselError: true})
+            return false
+        } else {
+            this.setState({peselError: false})
+            return true
+        }
+
     }
 
     handleDropdownChange(value, key) {
@@ -160,7 +166,7 @@ class Donations extends React.Component {
                 < DayPickerInput onDayChange={this.onChangeDate.bind(this)}
                                  value={this.state.date}/><br/><br/>
                 <Form.Select fluid label='Worker' options={this.props.workersOptions}
-                             placeholder='Worker'
+                             placeholder='Worker' error={this.state.peselError}
                              onChange={(e, {value}) => this.handleDropdownChange(value, 'workerPesel')}
                              value={this.state.workerPesel} disable={this.state.presenceId}/><br/>
             </div>
@@ -181,7 +187,7 @@ class Donations extends React.Component {
                                 <Form.Input id='form-input-control-id' control={Input} label='Id'
                                             placeholder='Id' value={this.state.id} disabled error={this.state.idError}/>
                                 <Form.Select fluid label='Patient' options={this.props.patientOptions}
-                                             placeholder='Presence'
+                                             placeholder='Presence' error={this.state.peselError}
                                              onChange={(e, {value}) => this.handleDropdownChange(value, 'patientPesel')}
                                              value={this.state.patientPesel}/>
                                 <Button.Group>
@@ -196,7 +202,7 @@ class Donations extends React.Component {
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue'
-                                        disabled={!this.state.patientPesel || !this.state.isSelected || !(this.state.date && this.state.workerPesel || this.state.presenceId) }
+                                        disabled={!this.state.patientPesel || !this.state.isSelected || !(this.state.date && this.state.workerPesel || this.state.presenceId)}
                                         onClick={this.handleUpdate.bind(this)}>
                                     Update
                                 </Button>
