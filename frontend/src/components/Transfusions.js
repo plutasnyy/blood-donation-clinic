@@ -104,6 +104,7 @@ class Transfusions extends React.Component {
         if (patientBlood.blood === 'B' && patientBlood.rh === '-' && sampleBlood.blood === 'B' && sampleBlood.rh === '-') {
             return true;
         }
+        this.setState({sampleIdError:true})
         return false;
     }
 
@@ -155,6 +156,8 @@ class Transfusions extends React.Component {
 
     handleAdd() {
         if (this.validateDate() && this.validateBlood() && this.validatePesel()) {
+
+            this.setState({sampleIdError:false})
             this.props.addItem(this.getPayload());
             let transfusion = this.getPayload();
             let sample = this.props.samplesItems.filter(sample => sample.id === transfusion.sample)[0];
@@ -165,6 +168,8 @@ class Transfusions extends React.Component {
 
     handleUpdate() {
         if (this.validateDate() && this.validateDate() && this.validatePesel()) {
+
+            this.setState({sampleIdError:false})
             this.props.updateItem(this.getPayload());
         }
     }
@@ -208,7 +213,7 @@ class Transfusions extends React.Component {
         let sampleForm = ""
         if (!this.state.isSelected) {
             sampleForm = <Form.Select fluid label='Sample' options={this.props.samplesOptions}
-                                      placeholder='Sample' error={this.state.dateError}
+                                      placeholder='Sample' error={this.state.dateError||this.state.sampleIdError}
                                       onChange={(e, {value}) => this.handleDropdownChange(value, 'sampleId')}
                                       value={this.state.sampleId}/>
         }
@@ -233,11 +238,11 @@ class Transfusions extends React.Component {
                                              value={this.state.patientPesel}/>
                                 {sampleForm}
                                 <Button type='submit' onClick={this.handleAdd.bind(this)} color='green'
-                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.sampleIdError || !this.state.sampleId || this.state.isSelected}>
+                                        disabled={!this.state.date || !this.state.workerPesel || !this.state.patientPesel || !this.state.sampleId || this.state.isSelected}>
                                     Add
                                 </Button>
                                 <Button type='submit' color='blue' onClick={this.handleUpdate.bind(this)}
-                                        disabled={!this.state.workerPesel || !this.state.patientPesel || this.state.sampleIdError || !this.state.sampleId || !this.state.isSelected}>
+                                        disabled={this.state.date === "" || !this.state.workerPesel || !this.state.patientPesel || !this.state.sampleId || !this.state.isSelected}>
                                     Update
                                 </Button>
                                 <Button onClick={this.resetState.bind(this)}>
